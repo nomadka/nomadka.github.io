@@ -1,0 +1,269 @@
+---
+import CaseLayout from '../../layouts/CaseLayout.astro';
+import CaseSection from '../../components/CaseSection.astro';
+
+const next = {
+  href: '/work/wood-defects/',
+  category: 'Applied CV · Manufacturing',
+  title: 'Wood surface defect detection',
+  image: '/images/wood-card.webp',
+  alt: 'Wood defect detection contact sheet with detections on planks and validation crops',
+};
+---
+
+<CaseLayout
+  title="ADMIT14 — camera-based localization & tracking"
+  description="A camera-based real-time localization and tracking system for a 1:14-scale autonomous driving environment: checkerboard calibration, overhead vehicle detection, and EKF tracking in MATLAB."
+  index="02"
+  category="Applied CV · Autonomous systems"
+  subtitle="Replacing indoor GPS with a hall-roof camera: a calibrated pixel-to-floor mapping, an overhead vehicle detector, and an EKF that turns noisy boxes into a state a planner can use."
+  meta={[
+    { label: 'Role', value: 'Team project · calibration, detection, tracking' },
+    { label: 'Timeline', value: '2024' },
+    { label: 'Context', value: 'ASM-VS · HS Esslingen' },
+    { label: 'Stack', value: 'MATLAB · YOLOv4-tiny · EKF · RTSP' },
+  ]}
+  next={next}
+>
+  <Fragment slot="media">
+    <nav class="case-toc" aria-label="On this page">
+      <a href="#problem">01 / Problem</a>
+      <a href="#pipeline">02 / Pipeline</a>
+      <a href="#calibration">03 / Camera to world</a>
+      <a href="#tracking">04 / Detection &amp; EKF</a>
+      <a href="#evidence">05 / Evidence &amp; limits</a>
+      <a href="#team">06 / Team</a>
+    </nav>
+
+    <figure class="case-lead-media">
+      <div class="figure__media">
+        <img
+          src="/images/admit14-hero.webp"
+          alt="Overhead view of a 1:14-scale test track drawn on the floor, with a checkerboard calibration target lying on the course"
+          width="1400"
+          height="809"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+      <figcaption>
+        The 1:14 test environment from the hall-roof camera. The checkerboard is part of the calibration routine, not a
+        permanent fixture on the track.
+      </figcaption>
+    </figure>
+  </Fragment>
+
+  <CaseSection number="01" title="GPS does not scale down to a tabletop city." id="problem">
+    <p class="case-lead">
+      A 1:14-scale traffic environment is a useful place to test planning. It is a terrible place to rely on satellite
+      positioning.
+    </p>
+    <p>
+      ADMIT14 is a scaled autonomous driving environment at Esslingen University of Applied Sciences. Vehicles need a
+      ground-truth state — position and heading — so motion-planning experiments can be judged against something more
+      reliable than the planner's own estimate. Indoor GPS was not an option.
+    </p>
+    <p>
+      The alternative was already mounted on the hall roof: a 4K IP camera looking down at the whole track. If the
+      camera could be calibrated precisely enough, every vehicle detected in its image could be projected onto the floor
+      plane and tracked over time. One camera, one fixed viewpoint, and a coordinate system shared by the rest of the
+      lab.
+    </p>
+    <div class="case-callout">
+      The deliverable was not just a detector. It was a coordinate system the rest of the lab could trust — with a
+      measured error small enough to defend the mapping.
+    </div>
+  </CaseSection>
+
+  <CaseSection number="02" title="One camera, five stages, no hidden state." id="pipeline">
+    <p class="case-lead">
+      The pipeline runs from an RTSP stream to a filtered vehicle state. Each stage has a measurable failure mode, which
+      is why the report treats them separately.
+    </p>
+
+    <div class="case-pipeline" aria-label="ADMIT14 pipeline">
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">01</span>
+        <div>
+          <h3>Acquire</h3>
+          <p>Pull frames from a Reolink PoE camera over RTSP using MATLAB's Image Acquisition Toolbox, with a preview stream to check stability.</p>
+          <span class="pipeline-step__meta">4K bird's-eye · RTSP · single camera</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">02</span>
+        <div>
+          <h3>Calibrate</h3>
+          <p>Estimate intrinsics from checkerboard views, then extrinsics from the floor plane. Undistort before any pixel is mapped to metres.</p>
+          <span class="pipeline-step__meta">9×6 checkerboard · 300 mm squares · 19 images</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">03</span>
+        <div>
+          <h3>Detect</h3>
+          <p>Find the car in the overhead frame. ACF provided the classical baseline; YOLOv4-tiny with transfer learning became the working detector.</p>
+          <span class="pipeline-step__meta">416 px · SGDM · batch 64 · 40 epochs</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">04</span>
+        <div>
+          <h3>Project</h3>
+          <p>Map the detected box from image coordinates to the floor plane using the calibrated camera model.</p>
+          <span class="pipeline-step__meta">img2world2d · undistorted frame</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">05</span>
+        <div>
+          <h3>Track</h3>
+          <p>Feed the projected measurements into an Extended Kalman Filter that estimates position, velocity, and heading over time.</p>
+          <span class="pipeline-step__meta">State [x, y, θ] · linear bicycle model</span>
+        </div>
+      </div>
+    </div>
+  </CaseSection>
+
+  <CaseSection number="03" title="The calibration is the product." id="calibration">
+    <p class="case-lead">
+      A detector can be approximately right. A coordinate transform cannot. The calibration step received most of the
+      engineering attention, and the report's strongest number comes from it.
+    </p>
+    <p>
+      A <strong>9×6 checkerboard with 300&nbsp;mm squares</strong> was photographed in <strong>19 positions</strong> across
+      the field of view, including the distorted edges. Those views produced the camera intrinsics and lens distortion
+      coefficients. A separate floor-plane view produced the extrinsics, which turn an undistorted pixel into a point on
+      the track.
+    </p>
+    <p>
+      The mean reprojection error across the 19 calibration images was <strong>0.09&nbsp;pixels</strong>. That is the
+      number that makes the rest of the system defensible: the mapping from image to floor is not a hand-tuned
+      homography, and the residual is measured rather than assumed.
+    </p>
+
+    <div class="case-metrics">
+      <div class="case-metric">
+        <strong>0.09 px</strong>
+        <span>mean calibration error across 19 views</span>
+      </div>
+      <div class="case-metric">
+        <strong>19</strong>
+        <span>checkerboard views covering the full field</span>
+      </div>
+      <div class="case-metric">
+        <strong>9×6</strong>
+        <span>checkerboard · 300 mm squares</span>
+      </div>
+    </div>
+
+    <figure class="case-figure case-figure--light">
+      <div class="figure__media">
+        <img src="/images/admit14-calibration.webp" alt="3D plot of 19 checkerboard planes positioned around the camera, used to estimate intrinsics and extrinsics" width="1618" height="1271" loading="lazy" decoding="async" />
+      </div>
+      <figcaption>
+        The 19 calibration planes in camera coordinates. Coverage at the frame edges is what pulls the distortion
+        estimate into shape.
+      </figcaption>
+    </figure>
+
+    <figure class="case-figure case-figure--light">
+      <div class="figure__media">
+        <img src="/images/admit14-undistort.webp" alt="Side-by-side overhead frames: the raw camera view with visible barrel distortion at the edges, and the same view after lens correction" width="1718" height="481" loading="lazy" decoding="async" />
+      </div>
+      <figcaption>
+        Left: the raw overhead frame, with the track bowing at the edges. Right: the same view after lens correction using
+        the calibrated intrinsics and distortion coefficients.
+      </figcaption>
+    </figure>
+
+    <p class="case-note">
+      World-coordinate accuracy was best directly below the camera and degraded toward the periphery — a geometric
+      consequence of the viewing angle, not a calibration failure. The report states this openly.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="04" title="A classical baseline, a transfer-learned detector, and an EKF." id="tracking">
+    <p class="case-lead">
+      Detection was the easy half. Turning a sequence of boxes into a stable heading estimate was the part that needed a
+      motion model.
+    </p>
+    <p>
+      The first detector was an <strong>Aggregated Channel Features (ACF)</strong> model: fast, interpretable, and
+      CPU-friendly, but limited on a visually variable object and without GPU acceleration. The working
+      detector became <strong>YOLOv4-tiny</strong>, fine-tuned with transfer learning at <strong>416&nbsp;px</strong>, using SGDM, a
+      learning rate of 1e-4, batch size 64, and 40 epochs.
+    </p>
+    <p>
+      Each valid detection is projected to the floor. The Extended Kalman Filter then estimates the
+      state <strong>[x, y, θ]</strong>, using a linear bicycle model for the prediction step and the projected box centre as
+      the measurement. Heading is part of the state because a car that is moving backwards and a car that is moving
+      forwards cast almost the same box.
+    </p>
+
+    <div class="case-pair">
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/admit14-labeling.webp" alt="MATLAB Image Labeler showing an overhead track frame with a bounding box drawn around the model car" width="1600" height="900" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Labelling in MATLAB's Image Labeler. One class, one object, and a background that changes with the light.</figcaption>
+      </figure>
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/admit14-tracking.webp" alt="Bird's-eye track frame with a car bounding box and an overlaid EKF-estimated trajectory" width="1136" height="754" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>The EKF track over the projected measurements. The filter smooths the box jitter; it cannot invent a measurement through an occlusion.</figcaption>
+      </figure>
+    </div>
+
+    <div class="case-callout">
+      The EKF is only as good as its noise model. Covariance tuning was empirical, and poor initialisation could make
+      the filter diverge — a failure mode the report documents rather than hides.
+    </div>
+  </CaseSection>
+
+  <CaseSection number="05" title="What the evidence supports — and what it does not." id="evidence">
+    <p class="case-lead">
+      The calibration result is quantitative. The detection comparison is largely qualitative. The tracking result is a
+      demonstration, not a benchmark. The page keeps those categories separate.
+    </p>
+    <ul class="case-list">
+      <li><strong>Supported:</strong> a mean calibration error of 0.09&nbsp;px from 19 views; a working pixel-to-floor mapping; YOLOv4-tiny detecting the car across the evaluated frames; an EKF producing a usable position and heading track.</li>
+      <li><strong>Not supported:</strong> a detection mAP, a tracking RMSE, or a latency figure. The report does not publish them, so this page does not invent them.</li>
+      <li><strong>Known constraint:</strong> MATLAB's <code>ipcam</code> interface did not expose frame-rate and resolution control. Resolution changes made calibration and detection harder to keep in sync.</li>
+      <li><strong>Known constraint:</strong> 4K frames caused jitter and lag in MATLAB, and a single overhead view cannot see through occlusions.</li>
+      <li><strong>Next step:</strong> multi-camera fusion, odometry or LiDAR for a better motion model, a UKF for stronger non-linearities, and a proper throughput measurement on the target machine.</li>
+    </ul>
+    <p class="case-note">
+      Detection numbers are reported as the project reported them. No latency, FPS, or accuracy claim has been added.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="06" title="A four-person project, with the seams visible." id="team">
+    <p class="case-lead">
+      ADMIT14 was built by a team, not a solo repository. Crediting that properly is part of documenting the work.
+    </p>
+    <p>
+      The project was completed in the <strong>ASM-VS</strong> programme at Esslingen University of Applied Sciences,
+      supervised by <strong>Prof. Dr. Ralf Schuler</strong>. The report authors
+      are <strong>M. S. Sri Harish</strong>, <strong>V. Mascarenhas</strong>, <strong>L. Cheng-Yu</strong>, and <strong>K. A. N. Noushiq Mohammed</strong>.
+    </p>
+    <p>
+      My work covered the camera-to-world mapping, the detector comparison, and the EKF tracking pipeline. The report
+      and its evaluation were written jointly by the team.
+    </p>
+    <div class="case-links">
+      <a class="btn btn--primary" href="mailto:noushikayilan@gmail.com?subject=ADMIT14%20report%20request">
+        Request the report
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      <a class="btn btn--ghost" href="/work/">All case studies</a>
+    </div>
+    <p class="case-note">
+      The full report is shared on request rather than published: it contains the lab camera configuration, which does
+      not belong on a public page.
+    </p>
+  </CaseSection>
+</CaseLayout>

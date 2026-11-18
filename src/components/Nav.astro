@@ -2,6 +2,7 @@
 const path = Astro.url.pathname;
 const isWork = path.startsWith('/work');
 const isResearch = path.startsWith('/research');
+const isExperience = path.startsWith('/experience');
 const isAbout = path.startsWith('/about');
 ---
 
@@ -16,22 +17,35 @@ const isAbout = path.startsWith('/about');
       <ul class="nav-links">
         <li><a href="/work/" aria-current={isWork ? 'page' : undefined}>Work</a></li>
         <li><a href="/research/" aria-current={isResearch ? 'page' : undefined}>Research</a></li>
+        <li><a href="/experience/" aria-current={isExperience ? 'page' : undefined}>Experience</a></li>
         <li><a href="/about/" aria-current={isAbout ? 'page' : undefined}>About</a></li>
         <li><a href="/#contact">Contact</a></li>
       </ul>
 
-      <a class="nav-cta" href="/#contact">
-        Let's talk
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-          <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </a>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false" title="Switch to light theme">
+          <svg class="theme-toggle__sun" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.4" />
+            <path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+          </svg>
+          <svg class="theme-toggle__moon" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20.2 14.1A8.4 8.4 0 0 1 9.9 3.8 8.5 8.5 0 1 0 20.2 14.1Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+          </svg>
+        </button>
 
-      <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu" data-nav-toggle>
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+        <a class="nav-cta" href="/#contact">
+          Let's talk
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu" data-nav-toggle>
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
     </nav>
   </div>
 </header>
@@ -40,8 +54,9 @@ const isAbout = path.startsWith('/about');
   <ol>
     <li><a href="/work/" aria-current={isWork ? 'page' : undefined}>Work <span>01</span></a></li>
     <li><a href="/research/" aria-current={isResearch ? 'page' : undefined}>Research <span>02</span></a></li>
-    <li><a href="/about/" aria-current={isAbout ? 'page' : undefined}>About <span>03</span></a></li>
-    <li><a href="/#contact">Contact <span>04</span></a></li>
+    <li><a href="/experience/" aria-current={isExperience ? 'page' : undefined}>Experience <span>03</span></a></li>
+    <li><a href="/about/" aria-current={isAbout ? 'page' : undefined}>About <span>04</span></a></li>
+    <li><a href="/#contact">Contact <span>05</span></a></li>
   </ol>
   <div class="mobile-menu__meta">
     <a href="mailto:noushikayilan@gmail.com">noushikayilan@gmail.com</a>

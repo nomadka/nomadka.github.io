@@ -25,14 +25,14 @@ const classes: Array<[string, number]> = [
 <CaseLayout
   title="Wood surface defect detection"
   description="An end-to-end YOLO pipeline for wood surface defects: dataset preparation, training, validation, per-class failure analysis, and live video inference."
-  index="02"
+  index="03"
   category="Applied computer vision"
-  subtitle="A full inspection pipeline for a natural material: eight defect classes, a long-tailed dataset, and the honest version of what the detector gets right."
+  subtitle="A full inspection pipeline for a natural material — built around YOLO26 nano so the detector can plausibly leave the notebook and run at the edge."
   meta={[
     { label: 'Role', value: 'Pipeline design · training · evaluation' },
-    { label: 'Timeline', value: '2025' },
-    { label: 'Type', value: 'Applied CV / manufacturing' },
-    { label: 'Stack', value: 'Ultralytics YOLO · OpenCV · yt-dlp · Kaggle' },
+    { label: 'Timeline', value: '2026' },
+    { label: 'Type', value: 'Applied CV / edge inspection' },
+    { label: 'Stack', value: 'YOLO26n · Ultralytics · OpenCV · yt-dlp' },
   ]}
   next={next}
 >
@@ -77,6 +77,11 @@ const classes: Array<[string, number]> = [
       classes: <strong>quartzity, live_knot, Marrow, resin, dead_knot, knot_with_crack, knot_missing, crack</strong>.
       Some are self-explanatory. Some are not, and that ambiguity shows up in the results.
     </p>
+    <p>
+      The model is <strong>YOLO26 nano</strong>, chosen deliberately over a larger variant.
+      At <strong>2.5&nbsp;million parameters</strong> and <strong>5.9&nbsp;GFLOPs</strong>, it is small enough to be a
+      credible edge candidate; the rest of the case study is about whether the accuracy justifies that budget.
+    </p>
     <div class="case-callout">
       A detector is only useful if the evaluation survives contact with the class distribution. The case study keeps
       the weak classes in the frame instead of reporting a single aggregate number.
@@ -110,8 +115,8 @@ const classes: Array<[string, number]> = [
         <span class="pipeline-step__index">03</span>
         <div>
           <h3>Train &amp; resume</h3>
-          <p>Fine-tune a pretrained detector at 320&nbsp;px, checkpoint to Google Drive, and resume the run from the last checkpoint when Colab disconnects.</p>
-          <span class="pipeline-step__meta">Ultralytics YOLO · 200 epochs · AMP</span>
+          <p>Fine-tune YOLO26 nano at 320&nbsp;px on 3,181 training images, checkpoint to Google Drive, and resume from the last checkpoint when Colab disconnects.</p>
+          <span class="pipeline-step__meta">YOLO26n · 200 epochs · AMP · auto-batch · seed 0</span>
         </div>
       </div>
       <div class="pipeline-step">
@@ -177,16 +182,17 @@ cap = cv2.VideoCapture(stream[<span class="tok-str">"url"</span>])
         <span>mAP50-95 at epoch 109</span>
       </div>
       <div class="case-metric">
-        <strong>8</strong>
-        <span>defect classes · 200 epochs · 320 px</span>
+        <strong>2.5M</strong>
+        <span>parameters · YOLO26n · 5.9 GFLOPs</span>
       </div>
     </div>
 
     <p>
-      At the best checkpoint, precision was <strong>0.670</strong> and recall <strong>0.621</strong>. At the final epoch,
-      mAP50 fell to <strong>0.568</strong> and mAP50-95 to <strong>0.289</strong>. The pipeline therefore selects
-      <strong>best.pt</strong> for inference, and the checkpoint is treated as part of the artifact — not an
-      afterthought.
+      The run used <strong>3,181 training</strong> and <strong>623 validation</strong> images, 200 epochs with mixed
+      precision, automatic batch sizing, and seed 0. At the best checkpoint, precision was <strong>0.670</strong> and
+      recall <strong>0.621</strong>. At the final epoch, mAP50 fell to <strong>0.568</strong> and mAP50-95
+      to <strong>0.289</strong>. The pipeline therefore selects <strong>best.pt</strong> for inference, and the checkpoint
+      is treated as part of the artifact - not an afterthought.
     </p>
 
     <div class="case-pair">
@@ -253,18 +259,19 @@ cap = cv2.VideoCapture(stream[<span class="tok-str">"url"</span>])
     </div>
   </CaseSection>
 
-  <CaseSection number="05" title="What I would change next." id="next">
+  <CaseSection number="05" title="The edge case is a hypothesis until it is measured." id="next">
     <p class="case-lead">
-      The pipeline is a solid baseline, not a finished inspection product. The next iteration would attack resolution,
-      class balance, and deployment together.
+      YOLO26 nano is small enough to make on-device inference plausible. That is not the same as proven. The next
+      iteration would turn the parameter budget into a measured deployment.
     </p>
 
     <ul class="case-list">
-      <li><strong>Raise the input resolution.</strong> Train at 640&nbsp;px or use tiled inference for thin cracks, then measure the latency cost honestly.</li>
+      <li><strong>Benchmark on the target.</strong> Export to ONNX, OpenVINO, or TensorRT and report latency, memory, and throughput on the actual inspection hardware at 320&nbsp;px — not on a Colab GPU.</li>
+      <li><strong>Quantise, then re-validate.</strong> Test INT8 post-training quantisation and measure the mAP drop on the held-out split before accepting the speedup.</li>
+      <li><strong>Raise resolution selectively.</strong> Train at 640&nbsp;px or use tiled inference for thin cracks, then pay for it honestly in the latency budget.</li>
       <li><strong>Rebalance the long tail.</strong> Targeted collection for quartzity and knot_with_crack, class-aware sampling, and harder copy-paste augmentation.</li>
       <li><strong>Audit the labels.</strong> A second annotator on the confusable classes would tell us whether the model is wrong or the ground truth is.</li>
-      <li><strong>Evaluate on a fixed camera.</strong> The public dataset is a proxy. A production inspection cell has fixed lighting, distance, and motion blur — and those should be in the test set.</li>
-      <li><strong>Export and measure.</strong> ONNX or TensorRT, then report frames per second on the target hardware, not just on a Colab GPU.</li>
+      <li><strong>Evaluate in the cell.</strong> Fixed lighting, working distance, vibration, and motion blur belong in the test set before any throughput number means anything.</li>
     </ul>
 
     <div class="case-links">

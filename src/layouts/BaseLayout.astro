@@ -4,6 +4,7 @@ import '@fontsource/instrument-serif/400-italic.css';
 import '@fontsource-variable/geist';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
+import '../styles/light.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 
@@ -73,12 +74,22 @@ const schema = structuredData ?? defaultSchema;
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap.xml" />
-    <meta name="theme-color" content="#07090c" />
+    <meta name="theme-color" content="#07090c" data-theme-color />
     <meta name="format-detection" content="telephone=no" />
     <link rel="me" href="https://github.com/nomadka" />
     <link rel="me" href="https://www.linkedin.com/in/noushiq" />
     <script is:inline>
-      document.documentElement.classList.add('js');
+      (() => {
+        let stored = null;
+        try {
+          stored = localStorage.getItem('nk-theme');
+        } catch {
+          /* storage can be unavailable in private contexts */
+        }
+        const theme = stored === 'light' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.classList.add('js');
+      })();
     </script>
 
     <meta property="og:type" content={type} />
@@ -131,6 +142,38 @@ const schema = structuredData ?? defaultSchema;
       });
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') setMenu(false);
+      });
+
+      const themeButtons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+      const themeMeta = document.querySelector<HTMLMetaElement>('[data-theme-color]');
+      const applyTheme = (theme: 'light' | 'dark') => {
+        document.documentElement.dataset.theme = theme;
+        if (themeMeta) themeMeta.content = theme === 'light' ? '#f3efe5' : '#07090c';
+        themeButtons.forEach((button) => {
+          const next = theme === 'light' ? 'dark' : 'light';
+          button.setAttribute('aria-label', `Switch to ${next} theme`);
+          button.setAttribute('title', `Switch to ${next} theme`);
+          button.setAttribute('aria-pressed', String(theme === 'light'));
+        });
+      };
+      const currentTheme = (): 'light' | 'dark' =>
+        document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+      applyTheme(currentTheme());
+      themeButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const next = currentTheme() === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try {
+            localStorage.setItem('nk-theme', next);
+          } catch {
+            /* storage can be unavailable in private contexts */
+          }
+        });
+      });
+      window.addEventListener('storage', (event) => {
+        if (event.key === 'nk-theme') {
+          applyTheme(event.newValue === 'light' ? 'light' : 'dark');
+        }
       });
 
       const progress = document.querySelector<HTMLElement>('.read-progress');

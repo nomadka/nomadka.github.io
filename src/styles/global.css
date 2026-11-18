@@ -23,6 +23,13 @@
   --line: rgba(244, 241, 234, 0.1);
   --line-strong: rgba(244, 241, 234, 0.2);
 
+  --header-bg: rgba(7, 9, 12, 0.78);
+  --menu-bg: rgba(7, 9, 12, 0.97);
+  --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.032), rgba(255, 255, 255, 0.008));
+  --panel-bg: rgba(255, 255, 255, 0.018);
+  --code-bg: #0a0e13;
+  --code-ink: #cfd6dd;
+
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -370,7 +377,7 @@ main [id] {
 }
 
 .site-header.is-scrolled {
-  background: rgba(7, 9, 12, 0.78);
+  background: var(--header-bg);
   border-color: var(--line);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -500,6 +507,43 @@ main [id] {
   color: var(--amber);
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.theme-toggle:hover {
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.theme-toggle__moon {
+  display: none;
+}
+
+html[data-theme="light"] .theme-toggle__sun {
+  display: none;
+}
+
+html[data-theme="light"] .theme-toggle__moon {
+  display: block;
+}
+
 .nav-toggle {
   display: none;
   width: 42px;
@@ -552,7 +596,7 @@ main [id] {
   position: fixed;
   inset: 74px 0 0;
   z-index: 90;
-  background: rgba(7, 9, 12, 0.97);
+  background: var(--menu-bg);
   backdrop-filter: blur(20px);
   padding: 32px var(--gutter) 48px;
   overflow-y: auto;
@@ -733,7 +777,7 @@ main [id] {
 }
 
 .card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.032), rgba(255, 255, 255, 0.008));
+  background: var(--card-bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;

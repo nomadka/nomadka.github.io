@@ -3,11 +3,11 @@ import CaseLayout from '../../layouts/CaseLayout.astro';
 import CaseSection from '../../components/CaseSection.astro';
 
 const next = {
-  href: '/work/wood-defects/',
-  category: 'Applied CV',
-  title: 'Wood surface defect detection',
-  image: '/images/wood-detection.webp',
-  alt: 'Wood plank with YOLO detection boxes around surface defects',
+  href: '/work/admit14/',
+  category: 'Applied CV · Autonomous systems',
+  title: 'ADMIT14 localization',
+  image: '/images/admit14-card.webp',
+  alt: 'Overhead view of a 1:14-scale test track with a car selected for labelling',
 };
 ---
 
@@ -187,6 +187,16 @@ const next = {
         <figcaption>Traffic-sign recognition in a daytime route: “Be mindful of stop sign.”</figcaption>
       </figure>
     </div>
+
+    <figure class="case-figure">
+      <div class="figure__media">
+        <img src="/images/tls-assist-yellow.webp" alt="CARLA yellow-light frame with left, focus, and right camera views, and a TrafficLightNotice injected into the driving agent's prompt" width="1200" height="900" loading="lazy" decoding="async" />
+      </div>
+      <figcaption>
+        A yellow-light frame from the closed-loop run: three camera views, the validated signal state, and the
+        natural-language notice added to the planner's input.
+      </figcaption>
+    </figure>
   </CaseSection>
 
   <CaseSection number="04" title="What was hard — and what I would change." id="notes">

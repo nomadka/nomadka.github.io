@@ -132,10 +132,10 @@ const metrics = [
       <figure class="paper-figure reveal">
         <div class="paper-figure__frame">
           <img
-            src="/images/tlsr-architecture.png"
-            alt="TLS-Assist architecture: image processing feeds traffic light and sign detection, relevance prediction, state validation, and a message generator connected to the autonomous driving agent"
-            width="2200"
-            height="950"
+            src="/images/tls-assist-architecture.webp"
+            alt="TLS-Assist architecture: three camera views feed image preprocessing, then a traffic-light branch with YOLO11x detection, relevance prediction, and state validation, and a traffic-sign branch with YOLO11l detection and prioritization; both feed a message generator and the LLM-based autonomous driving agent"
+            width="3483"
+            height="993"
             loading="lazy"
             decoding="async"
           />
@@ -233,8 +233,8 @@ const metrics = [
         <span class="mono accent">Route-level signal</span>
         <p>
           On the thesis's LangAuto-Long evaluation, the red-light penalty score fell from <strong>9.7</strong> with
-          LMDrive to <strong>3.8</strong> with the traffic-light layer, while the infraction score rose from
-          <strong>0.73</strong> to <strong>0.77</strong>. On shorter routes the improvement was smaller — a reminder
+          LMDrive to <strong>3.8</strong> with the traffic-light layer, while the infraction score
+          rose from <strong>0.73</strong> to <strong>0.77</strong>. On shorter routes the improvement was smaller - a reminder
           that route length, weather, and traffic density all move the result.
         </p>
       </div>
@@ -309,7 +309,7 @@ const metrics = [
           <div><dt>Degree</dt><dd>M.Eng. Automotive Systems</dd></div>
           <div><dt>University</dt><dd>Esslingen University of Applied Sciences</dd></div>
           <div><dt>Institute</dt><dd>Institute for Intelligent Systems (IIS)</dd></div>
-          <div><dt>Period</dt><dd>19 February – 18 August 2025</dd></div>
+          <div><dt>Period</dt><dd>March — August 2025</dd></div>
           <div><dt>Examiners</dt><dd>Prof. Dr. Markus Enzweiler · Fabian Schmidt, M.Sc.</dd></div>
         </dl>
         <p class="case-note">The thesis document is available on request.</p>

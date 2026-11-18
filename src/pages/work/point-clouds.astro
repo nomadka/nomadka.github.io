@@ -14,7 +14,7 @@ const next = {
 <CaseLayout
   title="Point-cloud alignment"
   description="Reverse-engineering a custom 3D viewer's coordinate system to align three point-cloud sets, including the reflections a quaternion cannot represent."
-  index="03"
+  index="04"
   category="3D geometry"
   subtitle="Three point-cloud sets, one viewer with an undocumented coordinate convention, and a transformation chain that had to survive reflections, pivots, and a trajectory file."
   meta={[
@@ -102,8 +102,8 @@ const next = {
 
     <p>
       With the target convention known, the correction decomposed into three pieces: a local sensor alignment, the
-      world-space camera path, and a final viewer orientation. The hard part was that the correction included
-      <strong>reflections</strong>, not just rotations.
+      world-space camera path, and a final viewer orientation. The hard part was that the correction
+      included <strong>reflections</strong>, not just rotations.
     </p>
     <p>
       That matters because quaternions represent rotations, not mirrors. A reflection matrix has a negative

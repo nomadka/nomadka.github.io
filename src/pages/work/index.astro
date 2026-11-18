@@ -17,22 +17,36 @@ const cases = [
     badge: 'Flagship / peer-reviewed',
   },
   {
-    href: '/work/wood-defects/',
+    href: '/work/admit14/',
     index: '02',
+    category: 'Applied CV · Autonomous systems',
+    title: 'ADMIT14 — camera-based localization & tracking',
+    description:
+      'Replacing indoor GPS in a 1:14-scale driving environment with a hall-roof camera: checkerboard calibration, overhead vehicle detection, and EKF tracking in MATLAB.',
+    proof: '0.09 px',
+    proofLabel: 'mean calibration error across 19 checkerboard views, with a working pixel-to-floor mapping.',
+    image: '/images/admit14-card.webp',
+    alt: 'Overhead view of a scaled test track with a model car selected for labelling',
+    tags: ['MATLAB', 'YOLOv4-tiny', 'EKF', 'Calibration'],
+    badge: 'University project',
+  },
+  {
+    href: '/work/wood-defects/',
+    index: '03',
     category: 'Applied CV · Manufacturing',
     title: 'Wood surface defect detection',
     description:
-      'An end-to-end YOLO pipeline that takes a public Kaggle dataset from raw labels to training, validation, image inference, and live inference on YouTube streams.',
+      'An end-to-end YOLO26 nano pipeline that takes a public Kaggle dataset from raw labels to training, validation, image inference, and live inference — sized for edge deployment.',
     proof: '0.626',
     proofLabel: 'mAP50 at the best checkpoint across eight defect classes — with the hard classes left visible.',
     image: '/images/wood-card.webp',
     alt: 'Wood defect detection contact sheet with detections on planks and four validation crops',
-    tags: ['YOLO', 'OpenCV', 'yt-dlp', 'Kaggle'],
+    tags: ['YOLO26n', 'OpenCV', 'Edge', 'Kaggle'],
     badge: 'Applied pipeline',
   },
   {
     href: '/work/point-clouds/',
-    index: '03',
+    index: '04',
     category: '3D geometry · Reconstruction',
     title: 'Point-cloud alignment',
     description:
@@ -46,7 +60,7 @@ const cases = [
   },
   {
     href: '/work/camera-calibration/',
-    index: '04',
+    index: '05',
     category: 'Tooling · Sensing',
     title: 'Camera calibration toolkit',
     description:
@@ -93,7 +107,7 @@ const experiments = [
 
 <BaseLayout
   title="Work"
-  description="Computer vision case studies: LLM-based autonomous driving, wood surface defect detection, point-cloud alignment, and camera calibration."
+  description="Computer vision case studies: LLM-based autonomous driving, camera-based localization, wood surface defect detection, point-cloud alignment, and camera calibration."
 >
   <header class="work-hero">
     <div class="container">
@@ -102,7 +116,7 @@ const experiments = [
         <span class="mono muted">Selected + applied</span>
       </div>
 
-      <h1>Four ways of making the world <em>legible.</em></h1>
+      <h1>Five ways of making the world <em>legible.</em></h1>
 
       <div class="work-hero__grid">
         <p class="work-hero__lead">
@@ -110,7 +124,7 @@ const experiments = [
           explains the engineering, and ends with evidence — including the parts that did not work.
         </p>
         <dl class="work-hero__stats">
-          <div><dt>Case studies</dt><dd>04</dd></div>
+          <div><dt>Case studies</dt><dd>05</dd></div>
           <div><dt>Publication</dt><dd>IEEE IV 2026</dd></div>
           <div><dt>Sensing</dt><dd>Camera · LiDAR · sim</dd></div>
         </dl>
@@ -118,9 +132,10 @@ const experiments = [
 
       <nav class="work-jump" aria-label="Case studies">
         <a href="#tls-assist"><span>01</span> TLS-Assist</a>
-        <a href="#wood-defects"><span>02</span> Wood defects</a>
-        <a href="#point-clouds"><span>03</span> Point clouds</a>
-        <a href="#camera-calibration"><span>04</span> Calibration</a>
+        <a href="#admit14"><span>02</span> ADMIT14</a>
+        <a href="#wood-defects"><span>03</span> Wood defects</a>
+        <a href="#point-clouds"><span>04</span> Point clouds</a>
+        <a href="#camera-calibration"><span>05</span> Calibration</a>
       </nav>
     </div>
   </header>

@@ -1,0 +1,804 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const roles: Array<{
+  dates: string;
+  place: string;
+  org: string;
+  title: string;
+  points: string[];
+  links: Array<{ href: string; label: string }>;
+}> = [
+  {
+    dates: 'Jan 2026 — Present',
+    place: 'Germany',
+    org: 'Independent · Open source',
+    title: 'Computer Vision Engineer',
+    points: [
+      'Built a YOLO26 nano wood-surface defect pipeline end to end: dataset preparation, training, per-class evaluation, image inference, and live video inference.',
+      'Built a local VLM + RAG pipeline for image information extraction with Moondream and Qwen via Ollama, exposed through a Streamlit interface so it runs without cloud or GPU-heavy infrastructure.',
+    ],
+    links: [
+      { href: '/work/wood-defects/', label: 'Wood defect case study' },
+    ],
+  },
+  {
+    dates: 'Sep 2025 — Jan 2026',
+    place: 'Germany',
+    org: 'Institute for Intelligent Systems · HS Esslingen',
+    title: 'Research Associate',
+    points: [
+      'Evaluated and ran inference for the TLS-Assist perception layer on LMDrive and BEVDriver in closed-loop CARLA, supporting the IEEE IV 2026 publication.',
+      'Supported LiDAR-based 3D semantic occupancy ground-truth generation: point-cloud preprocessing, LiDAR fusion, voxelization, and mIoU evaluation against manually annotated scenes.',
+      'Implemented a Qwen-based traffic-notice instruction module for CARLA and compared it with the camera-based traffic-light and sign recognition system.',
+    ],
+    links: [
+      { href: '/research/', label: 'Research & publication' },
+    ],
+  },
+  {
+    dates: 'Mar 2025 — Aug 2025',
+    place: 'Germany',
+    org: 'Institute for Intelligent Systems · HS Esslingen',
+    title: "Master's Thesis Student",
+    points: [
+      'Designed and deployed an end-to-end integration of CARLA traffic-light and sign ground truth through the Python API, reducing related driving infractions by 23%.',
+      'Developed a modular traffic-light and sign perception stack that produced a 14% relative driving-performance improvement; evaluated detection with k-fold cross-validation and built a 4.3k+ image traffic-sign dataset.',
+      'Trained and evaluated models on HPC clusters using SSH, batch job scripts, and Slurm workload management.',
+    ],
+    links: [
+      { href: '/work/tls-assist/', label: 'TLS-Assist case study' },
+    ],
+  },
+  {
+    dates: 'Sep 2024 — Aug 2025',
+    place: 'Germany',
+    org: 'Robert Bosch GmbH',
+    title: 'Student Engineer',
+    points: [
+      'Supported the lane-detection data pipeline for level 3 and level 4 autonomous driving, including annotation, validation, and label sanity checking.',
+      'Built automated data-quality validation with pandas and OpenCV across approximately 2 million frames: image and file integrity, naming conventions, missing files, and near-monochrome frame filtering.',
+      'Managed supplier labelling quality reviews in Jira and Confluence for Kognic, Telus, and Deepen AI, reducing systematic labelling errors by 20%.',
+    ],
+    links: [],
+  },
+  {
+    dates: 'Nov 2020 — Aug 2023',
+    place: 'India',
+    org: 'ASI — GE Healthcare',
+    title: 'Engineering Analyst',
+    points: [
+      'Built a PaddleOCR document pipeline with OpenCV preprocessing and rule-based post-processing to extract structured fields from scanned medical reports, reaching 96.1% field-extraction accuracy.',
+      'Managed Label Studio annotation workflows — bounding boxes, polygons, and text transcription — with review stages and inter-annotator agreement checks.',
+      'Developed a YOLO-based BOM detection pipeline for automotive teardown and reverse engineering, detecting standard parts and compiling a tree-structured assembly BOM.',
+    ],
+    links: [],
+  },
+  {
+    dates: 'Nov 2018 — Nov 2019',
+    place: 'India',
+    org: 'Bharat Heavy Electricals Ltd',
+    title: 'Graduate Apprentice Trainee',
+    points: [
+      'Managed daily production and inventory in SAP ERP, improving external order fulfilment by 5% through the salvage of rejected products.',
+    ],
+    links: [],
+  },
+];
+
+const education = [
+  {
+    dates: 'Aug 2023 — Aug 2025',
+    place: 'Esslingen, Germany',
+    degree: 'M.Eng. Automotive Systems',
+    school: 'Esslingen University of Applied Sciences',
+    note: 'Specialised in integrating perception solutions into autonomous systems.',
+    points: [
+      'Autonomous systems: computer vision and deep learning, SLAM, motion planning, and prediction.',
+      'Software architecture: SDLC models, requirements engineering, modern C++, testing, APIs, and CI/CD.',
+      'Systems engineering: MBSE, the V-model, and MATLAB System Composer for ADAS architecture work.',
+    ],
+  },
+  {
+    dates: 'Jul 2014 — Apr 2018',
+    place: 'Kerala, India',
+    degree: 'B.Tech Mechanical Engineering',
+    school: 'University of Calicut',
+    note: 'Graduated in the top 5% of the cohort.',
+    points: [
+      'Specialised in mechatronics, CAE, and CAD software.',
+      'Awarded a Certificate of Excellence for academic performance.',
+    ],
+  },
+];
+
+const certifications: Array<{ date: string; title: string; issuer: string; note?: string }> = [
+  { date: '26 Feb 2024', title: 'MATLAB Onramp', issuer: 'MathWorks' },
+  { date: '05 Apr 2024', title: 'Image Processing Onramp', issuer: 'MathWorks' },
+  { date: '19 Mar 2025', title: 'Machine Learning Onramp', issuer: 'MathWorks' },
+  { date: '14 Apr 2025', title: 'Computer Vision Onramp', issuer: 'MathWorks' },
+  { date: '28 Dec 2025', title: 'pandas Essential Training', issuer: 'LinkedIn Learning' },
+  { date: '16 Oct 2018', title: 'Diploma in Mechanical Designing', issuer: 'CADCENTER · 360 hours', note: 'AutoCAD 2018 · ANSYS · Creo · Fusion 360' },
+];
+
+const awards = [
+  {
+    title: 'Certificate of Appreciation',
+    issuer: 'ASI',
+    body: 'Recognised by the Managing Director for exceptional adaptability.',
+  },
+  {
+    title: 'Certificate of Excellence',
+    issuer: "Bachelor's cohort",
+    body: 'Awarded for academic excellence, placing in the top 5% of the cohort.',
+  },
+  {
+    title: 'Best Make in India Safety Award',
+    issuer: 'Mechatronics project',
+    body: 'A three-stage sensing, braking, and detaching concept aimed at reducing locomotive derailment casualties.',
+  },
+];
+
+const languages = [
+  { name: 'English', level: 'Native', code: 'C2+' },
+  { name: 'Malayalam', level: 'Native', code: 'C2+' },
+  { name: 'German', level: 'Intermediate', code: 'B1' },
+  { name: 'Hindi', level: 'Upper intermediate', code: 'B2' },
+  { name: 'Tamil', level: 'Advanced', code: 'C1' },
+];
+---
+
+<BaseLayout
+  title="Experience"
+  description="Noushiq Kayilan's experience: computer vision and research roles at IIS Esslingen, Robert Bosch, GE Healthcare, and BHEL, plus education, certifications, awards, and languages."
+>
+  <header class="exp-hero">
+    <div class="container">
+      <div class="exp-hero__top">
+        <p class="eyebrow">Experience / 2018 — present</p>
+        <span class="mono muted">Roles · education · credentials</span>
+      </div>
+
+      <div class="exp-hero__grid">
+        <div>
+          <h1>The record behind the <em>work.</em></h1>
+        </div>
+        <div class="exp-hero__side">
+          <p class="exp-hero__lead">
+            Five-plus years across automotive perception, industrial imaging, and research. The short version is in the
+            case studies; this is the timeline, the credentials, and the places the work happened.
+          </p>
+          <div class="exp-hero__meta">
+            <span><b>Based</b> Stuttgart, Germany</span>
+            <span><b>Degree</b> M.Eng. Automotive Systems</span>
+            <span><b>Focus</b> Perception · autonomy · applied AI</span>
+          </div>
+        </div>
+      </div>
+
+      <dl class="exp-stats">
+        <div><dt>Combined experience</dt><dd>5+ years</dd></div>
+        <div><dt>Roles</dt><dd>06</dd></div>
+        <div><dt>Degrees</dt><dd>02</dd></div>
+        <div><dt>Certifications</dt><dd>06</dd></div>
+      </dl>
+    </div>
+  </header>
+
+  <section class="exp-section" aria-labelledby="roles-title">
+    <div class="container exp-grid">
+      <div class="exp-label">
+        <p class="eyebrow" id="roles-title">01 / Roles</p>
+        <p class="exp-label__note">Industry, research, and independent work. Project narratives live in the case studies.</p>
+      </div>
+      <div class="role-list">
+        {roles.map((role) => (
+          <article class="role">
+            <div class="role__when">
+              <span class="role__dates">{role.dates}</span>
+              <span class="role__place">{role.place}</span>
+            </div>
+            <div class="role__body">
+              <p class="role__org">{role.org}</p>
+              <h3>{role.title}</h3>
+              <ul class="role__points">
+                {role.points.map((point) => <li>{point}</li>)}
+              </ul>
+              {role.links.length > 0 && (
+                <div class="role__links">
+                  {role.links.map((link) => (
+                    <a class="link-arrow" href={link.href}>
+                      {link.label}
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                        <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="exp-section" aria-labelledby="education-title">
+    <div class="container exp-grid">
+      <div class="exp-label">
+        <p class="eyebrow" id="education-title">02 / Education</p>
+        <p class="exp-label__note">Formal training in systems, software, and perception — not only model fitting.</p>
+      </div>
+      <div class="edu-list">
+        {education.map((item) => (
+          <article class="edu">
+            <div class="edu__top">
+              <span class="mono accent">{item.dates}</span>
+              <span class="mono muted">{item.place}</span>
+            </div>
+            <h3>{item.degree}</h3>
+            <p class="edu__school">{item.school}</p>
+            <p class="edu__note">{item.note}</p>
+            <ul class="role__points">
+              {item.points.map((point) => <li>{point}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="exp-section" aria-labelledby="credentials-title">
+    <div class="container exp-grid">
+      <div class="exp-label">
+        <p class="eyebrow" id="credentials-title">03 / Certifications</p>
+        <p class="exp-label__note">Short, verifiable courses — the dates are the dates on the certificates.</p>
+      </div>
+      <div class="cert-grid">
+        {certifications.map((cert) => (
+          <article class="cert">
+            <span class="cert__date">{cert.date}</span>
+            <h3>{cert.title}</h3>
+            <p>{cert.issuer}</p>
+            {cert.note && <span class="cert__note">{cert.note}</span>}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="exp-section" aria-labelledby="awards-title">
+    <div class="container exp-grid">
+      <div class="exp-label">
+        <p class="eyebrow" id="awards-title">04 / Awards</p>
+        <p class="exp-label__note">Recognition for engineering work and academic performance.</p>
+      </div>
+      <div class="award-list">
+        {awards.map((award, i) => (
+          <article class="award">
+            <span class="award__index">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h3>{award.title}</h3>
+              <p>{award.body}</p>
+            </div>
+            <span class="award__issuer">{award.issuer}</span>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="exp-section" aria-labelledby="languages-title">
+    <div class="container exp-grid">
+      <div class="exp-label">
+        <p class="eyebrow" id="languages-title">05 / Languages</p>
+        <p class="exp-label__note">Working across German engineering teams and international research groups.</p>
+      </div>
+      <ul class="lang-list">
+        {languages.map((language) => (
+          <li class="lang">
+            <span class="lang__name">{language.name}</span>
+            <span class="lang__level">{language.level}</span>
+            <span class="lang__code">{language.code}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="exp-cta">
+    <div class="container exp-cta__inner">
+      <div>
+        <p class="eyebrow reveal">Next</p>
+        <h2 class="reveal" style="--delay: 60ms">The PDF has the references. The site has the <em>evidence.</em></h2>
+      </div>
+      <div class="exp-cta__actions reveal" style="--delay: 120ms">
+        <a class="btn btn--primary" href="mailto:noushikayilan@gmail.com?subject=CV%20request">
+          Request the full CV
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="btn btn--ghost" href="/work/">Browse the case studies</a>
+        <a class="btn btn--ghost" href="https://www.linkedin.com/in/noushiq" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .exp-hero {
+    padding-top: clamp(126px, 15vw, 176px);
+    padding-bottom: clamp(44px, 6vw, 70px);
+  }
+
+  .exp-hero__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+
+  .exp-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(30px, 6vw, 80px);
+    align-items: end;
+    margin-top: clamp(32px, 4vw, 48px);
+  }
+
+  .exp-hero h1 {
+    max-width: 11ch;
+    font-family: var(--font-serif);
+    font-size: clamp(3.3rem, 7.3vw, 7.1rem);
+    line-height: 0.91;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .exp-hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .exp-hero__lead {
+    font-size: clamp(1rem, 1.4vw, 1.14rem);
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .exp-hero__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .exp-hero__meta b {
+    display: inline-block;
+    min-width: 58px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .exp-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin: clamp(34px, 5vw, 54px) 0 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .exp-stats dt {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .exp-stats dd {
+    margin: 6px 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    line-height: 1;
+  }
+
+  .exp-section {
+    padding-block: clamp(48px, 6.5vw, 82px);
+    border-top: 1px solid var(--line);
+  }
+
+  .exp-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.3fr) minmax(0, 0.7fr);
+    gap: clamp(30px, 6vw, 84px);
+    align-items: start;
+  }
+
+  .exp-label {
+    position: sticky;
+    top: 104px;
+  }
+
+  .exp-label__note {
+    max-width: 28ch;
+    margin-top: 18px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .role-list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .role {
+    display: grid;
+    grid-template-columns: 136px minmax(0, 1fr);
+    gap: clamp(18px, 3vw, 34px);
+    padding-block: clamp(24px, 3vw, 36px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .role__when {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    padding-top: 3px;
+  }
+
+  .role__dates {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    color: var(--amber);
+  }
+
+  .role__place {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .role__org {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    line-height: 1.6;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .role h3 {
+    margin-top: 6px;
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+    line-height: 1.02;
+  }
+
+  .role__points {
+    display: grid;
+    gap: 9px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .role__points li {
+    position: relative;
+    padding-left: 16px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .role__points li::before {
+    content: "";
+    position: absolute;
+    top: 0.62em;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    background: var(--amber);
+  }
+
+  .role__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin-top: 18px;
+  }
+
+  .role__links .link-arrow {
+    font-size: 9px;
+  }
+
+  .edu-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .edu {
+    padding: clamp(22px, 3vw, 30px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--panel-bg);
+  }
+
+  .edu__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .edu h3 {
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(1.65rem, 2.6vw, 2.2rem);
+    line-height: 1.02;
+  }
+
+  .edu__school {
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .edu__note {
+    margin-top: 10px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--amber);
+  }
+
+  .cert-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .cert {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--panel-bg);
+  }
+
+  .cert__date {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .cert h3 {
+    margin-top: 4px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .cert p {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .cert__note {
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    line-height: 1.6;
+    color: var(--muted-2);
+  }
+
+  .award-list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .award {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 120px;
+    gap: 20px;
+    align-items: start;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .award__index {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+  }
+
+  .award h3 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.35rem, 2.1vw, 1.75rem);
+    line-height: 1.1;
+  }
+
+  .award p {
+    margin-top: 7px;
+    max-width: 56ch;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .award__issuer {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+    text-align: right;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .lang-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .lang {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px 54px;
+    gap: 20px;
+    align-items: baseline;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .lang__name {
+    font-family: var(--font-serif);
+    font-size: clamp(1.35rem, 2vw, 1.7rem);
+    line-height: 1;
+  }
+
+  .lang__level {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .lang__code {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-align: right;
+    color: var(--amber);
+  }
+
+  .exp-cta {
+    padding-block: clamp(64px, 9vw, 110px);
+    border-top: 1px solid var(--line);
+  }
+
+  .exp-cta__inner {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .exp-cta h2 {
+    max-width: 20ch;
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 5vw, 4.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+  }
+
+  .exp-cta h2 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .exp-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 1000px) {
+    .exp-hero__grid,
+    .exp-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .exp-label {
+      position: static;
+    }
+
+    .exp-label__note {
+      max-width: 52ch;
+    }
+
+    .exp-cta__inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .exp-hero__top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 7px;
+    }
+
+    .exp-hero h1 {
+      max-width: 100%;
+    }
+
+    .exp-stats {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .role {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .role__when {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+    }
+
+    .cert-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .award {
+      grid-template-columns: 30px minmax(0, 1fr);
+    }
+
+    .award__issuer {
+      grid-column: 2;
+      text-align: left;
+    }
+
+    .lang {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px 16px;
+    }
+
+    .lang__code {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .lang__level {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

@@ -153,18 +153,28 @@ const proof = [
 
       <div class="work-grid">
         <ProjectCard
-          href="/work/wood-defects/"
+          href="/work/admit14/"
           index="02"
+          title="ADMIT14 localization"
+          description="Replacing indoor GPS with a calibrated hall-roof camera: checkerboard calibration, overhead detection, and EKF tracking for a 1:14-scale driving environment."
+          image="/images/admit14-card.webp"
+          alt="Overhead view of a scaled test track with a model car selected for labelling"
+          meta="Autonomous systems"
+          tags={['MATLAB', 'EKF', 'Calibration']}
+        />
+        <ProjectCard
+          href="/work/wood-defects/"
+          index="03"
           title="Wood surface defect detection"
-          description="An end-to-end YOLO pipeline that takes a Kaggle dataset from raw labels to real-time inference on live video streams."
+          description="An end-to-end YOLO26 nano pipeline that takes a Kaggle dataset from raw labels to real-time inference — sized for edge deployment."
           image="/images/wood-card.webp"
           alt="Wood defect detection results: a plank with live-knot and dead-knot detections, plus validation crops"
           meta="Applied CV"
-          tags={['YOLO', 'OpenCV', 'Python']}
+          tags={['YOLO26n', 'Edge', 'Python']}
         />
         <ProjectCard
           href="/work/point-clouds/"
-          index="03"
+          index="04"
           title="Point-cloud alignment"
           description="Reconstructing the exact transform between three point-cloud datasets and a custom 3D viewer with its own hidden coordinate convention."
           image="/images/pcd-card.webp"
@@ -174,7 +184,7 @@ const proof = [
         />
         <ProjectCard
           href="/work/camera-calibration/"
-          index="04"
+          index="05"
           title="Camera calibration toolkit"
           description="A reusable OpenCV module for intrinsics, distortion, undistortion, and reprojection-error checks."
           image="/images/calibration-target.webp"
@@ -224,15 +234,15 @@ const proof = [
         <figure class="paper-figure reveal" style="--delay: 100ms">
           <div class="paper-figure__frame">
             <img
-              src="/images/tlsr-architecture.png"
-              alt="TLS-Assist architecture: image processing feeds traffic light and sign detection, relevance prediction, state validation, and a message generator connected to the autonomous driving agent"
-              width="2200"
-              height="950"
+              src="/images/tls-assist-architecture.webp"
+              alt="TLS-Assist architecture: three camera views feed preprocessing, traffic-light detection with YOLO11x and traffic-sign detection with YOLO11l, then relevance prediction, state validation, prioritization, a message generator, and the LLM-based driving agent"
+              width="3483"
+              height="993"
               loading="lazy"
               decoding="async"
             />
           </div>
-          <figcaption>The TLS-Assist pipeline: from multi-view images to structured language for the driving agent.</figcaption>
+          <figcaption>The TLS-Assist pipeline: from three camera views to structured language for the driving agent.</figcaption>
         </figure>
       </div>
     </div>
@@ -896,7 +906,7 @@ const proof = [
 
   .work-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
     margin-top: 16px;
   }

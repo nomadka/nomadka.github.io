@@ -25,7 +25,7 @@ const errors = [
 <CaseLayout
   title="Camera calibration toolkit"
   description="A reusable OpenCV calibration module for chessboard intrinsics, lens distortion, undistortion, ROI cropping, and reprojection-error checks — verified against a synthetic camera with known parameters."
-  index="04"
+  index="05"
   category="Perception tooling"
   subtitle="A camera is a measurement device only if you know its geometry. This toolkit recovers intrinsics and distortion from a chessboard, undistorts images two ways, and scores its own fit."
   meta={[
@@ -159,8 +159,8 @@ x, y, w, h = roi
 clean = clean[y:y + h, x:x + w]</code></pre>
     </div>
     <p class="case-note">
-      The repository uses <code>findChessboardCornersSB</code> followed by <code>cornerSubPix</code>, and exposes both
-      <code>undistort</code> and <code>remap</code> paths. The snippet is condensed for readability.
+      The repository uses <code>findChessboardCornersSB</code> followed by <code>cornerSubPix</code>, and
+      exposes both <code>undistort</code> and <code>remap</code> paths. The snippet is condensed for readability.
     </p>
   </CaseSection>
 
