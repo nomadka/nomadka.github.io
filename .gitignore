@@ -1,0 +1,18 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# local review material (cloned repos, source documents)
+_review/
+_input/
+
+# environment and local files
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db

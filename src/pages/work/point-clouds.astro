@@ -1,0 +1,223 @@
+---
+import CaseLayout from '../../layouts/CaseLayout.astro';
+import CaseSection from '../../components/CaseSection.astro';
+
+const next = {
+  href: '/work/camera-calibration/',
+  category: 'Perception tooling',
+  title: 'Camera calibration toolkit',
+  image: '/images/calibration-target.webp',
+  alt: 'Checkerboard calibration target with coordinate axes',
+};
+---
+
+<CaseLayout
+  title="Point-cloud alignment"
+  description="Reverse-engineering a custom 3D viewer's coordinate system to align three point-cloud sets, including the reflections a quaternion cannot represent."
+  index="03"
+  category="3D geometry"
+  subtitle="Three point-cloud sets, one viewer with an undocumented coordinate convention, and a transformation chain that had to survive reflections, pivots, and a trajectory file."
+  meta={[
+    { label: 'Role', value: 'Geometry · implementation' },
+    { label: 'Timeline', value: '2026' },
+    { label: 'Type', value: '3D reconstruction / tooling' },
+    { label: 'Stack', value: 'Python · Open3D · NumPy' },
+  ]}
+  next={next}
+>
+  <Fragment slot="media">
+    <nav class="case-toc" aria-label="On this page">
+      <a href="#problem">01 / Problem</a>
+      <a href="#reverse">02 / Reverse-engineering</a>
+      <a href="#transform">03 / The transform</a>
+      <a href="#result">04 / Result</a>
+      <a href="#lessons">05 / Lessons</a>
+    </nav>
+
+    <figure class="case-lead-media">
+      <div class="figure__media">
+        <img
+          src="/images/pcd-card.webp"
+          alt="Aligned point cloud inside a custom viewer, with a raw misaligned inset and coordinate axes"
+          width="1200"
+          height="900"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+      <figcaption>
+        The corrected scene in the target viewer. The inset is the same data before the coordinate transform — mirrored,
+        inverted, and unusable for navigation.
+      </figcaption>
+    </figure>
+  </Fragment>
+
+  <CaseSection number="01" title="The geometry was correct. The coordinate system was not." id="problem">
+    <p class="case-lead">
+      Three point-cloud sets arrived with world-space camera poses. The target viewer expected its own native frame.
+      Nothing documented what that frame was.
+    </p>
+    <p>
+      Loading the raw data in a standard tool produced a scene that was recognisably a room, but the viewer showed it
+      mirrored, upside down, or drifting depending on which correction was applied. The camera trajectory had the same
+      problem: it was mathematically consistent with the point clouds, and consistently wrong in the viewer.
+    </p>
+    <p>
+      The task was to compute the exact transform from each source frame into the viewer's frame, apply it to the
+      geometry, and make the result verifiable in both Open3D and the custom engine. “Looks approximately right” was not
+      good enough; the scene had to be geometrically consistent.
+    </p>
+    <div class="case-callout">
+      The bug was not in the point clouds. It was in the unstated contract between three coordinate conventions: the
+      sensor, the world, and the viewer.
+    </div>
+  </CaseSection>
+
+  <CaseSection number="02" title="Find the convention before writing the transform." id="reverse">
+    <p class="case-lead">
+      The first useful move was to stop guessing. A dummy XYZ frame, rendered with an identity pose, turns an
+      undocumented viewer into a measurable coordinate system.
+    </p>
+    <p>
+      Loading the raw clouds and the camera-to-world poses into Open3D established a baseline: the data was internally
+      consistent, but its orientation did not match the target. To identify the viewer's axes, I generated a dummy
+      coordinate frame in Open3D and loaded it into the viewer with an identity matrix. The result showed the target
+      convention: <strong>right-handed, Y-down, Z-outward</strong>.
+    </p>
+
+    <div class="case-pair">
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/pcd-o3d-before.webp" alt="Dummy XYZ axes in Open3D" width="790" height="726" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>The probe frame in Open3D. X red, Y green, Z blue.</figcaption>
+      </figure>
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/pcd-o3d-after.webp" alt="The same dummy axes rendered in the custom viewer" width="1071" height="462" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>The same frame in the target viewer. The axes are not where a standard camera convention would put them.</figcaption>
+      </figure>
+    </div>
+
+    <p>
+      With the target convention known, the correction decomposed into three pieces: a local sensor alignment, the
+      world-space camera path, and a final viewer orientation. The hard part was that the correction included
+      <strong>reflections</strong>, not just rotations.
+    </p>
+    <p>
+      That matters because quaternions represent rotations, not mirrors. A reflection matrix has a negative
+      determinant; decomposing it into a quaternion and a translation silently loses the handedness. The scene looks
+      almost right, then drifts or mirrors somewhere else. The fix was to stop forcing the whole transform through a
+      quaternion decomposition and apply the compound matrix directly.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="03" title="Bake the transform into the geometry." id="transform">
+    <p class="case-lead">
+      The final pipeline applies the full compound equation to every vertex and writes an identity trajectory. The
+      viewer has nothing left to reinterpret.
+    </p>
+
+    <div class="case-code">
+      <div class="case-code__bar"><span>transform.py / the compound equation</span><span>Python</span></div>
+      <pre><code><span class="tok-com"># local sensor alignment → world-space camera path → viewer orientation</span>
+T_sensor = local_alignment(sensor_frame)
+T_world  = camera_to_world(poses)
+T_viewer = viewer_orientation(<span class="tok-str">"right-handed"</span>, <span class="tok-str">"y-down"</span>, <span class="tok-str">"z-outward"</span>)
+
+T = T_viewer @ T_world @ T_sensor
+
+<span class="tok-com"># bake the transform into the points; do not ask the viewer to re-apply it</span>
+points_viewer = (T[:<span class="tok-str">3</span>, :<span class="tok-str">3</span>] @ points.T).T + T[:<span class="tok-str">3</span>, <span class="tok-str">3</span>]
+write_ply(points_viewer, <span class="tok-str">"output_data/viewer_corrected/scene.ply"</span>)
+
+<span class="tok-com"># the trajectory is already expressed in the final frame</span>
+write_trajectory(identity_matrices(len(poses)), <span class="tok-str">"output_data/viewer_corrected/traj.txt"</span>)</code></pre>
+    </div>
+
+    <p>
+      The identity trajectory is deliberate. Earlier versions let the viewer apply its own transform on top of the
+      corrected points, which introduced a second, hidden correction. Baking the geometry into absolute world positions
+      and neutralising the trajectory removed that class of bug entirely.
+    </p>
+    <p>
+      This also bypassed a subtler issue: the viewer's rotation pivot was not the world origin. A correct rotation around
+      the wrong centroid produces localised drift that looks like a bad point cloud. Absolute positioning avoids the
+      pivot question altogether.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="04" title="Before and after, in the same viewport." id="result">
+    <p class="case-lead">
+      The comparison below is the Open3D view of the raw data and the corrected data. Drag the handle to move between
+      them.
+    </p>
+
+    <div class="ba" data-ba style="--pos: 50%">
+      <div class="ba__frame">
+        <img class="ba__img ba__img--before" src="/images/pcd-ba-before.webp" alt="Point cloud in Open3D before alignment: a collapsed, rotated mass" width="1200" height="600" loading="lazy" decoding="async" />
+        <img class="ba__img" src="/images/pcd-ba-after.webp" alt="Point cloud in Open3D after alignment: a coherent indoor scene" width="1200" height="600" loading="lazy" decoding="async" />
+        <span class="ba__tag ba__tag--before">Raw</span>
+        <span class="ba__tag ba__tag--after">Aligned</span>
+        <span class="ba__line" aria-hidden="true"></span>
+        <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Compare raw and aligned point clouds" data-ba-range />
+      </div>
+    </div>
+    <p class="ba__hint">Drag to compare · raw → aligned</p>
+
+    <div class="case-pair">
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/pcd-before.webp" alt="Raw point cloud in the custom viewer, mirrored and inverted" width="491" height="393" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Raw data in the custom viewer. The scene is mirrored and inverted relative to the camera path.</figcaption>
+      </figure>
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/pcd-after.webp" alt="Corrected point cloud in the custom viewer, showing a coherent indoor scene" width="1192" height="449" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Corrected data in the same viewer. The room, furniture, and camera path now agree.</figcaption>
+      </figure>
+    </div>
+
+    <p class="case-note">
+      The corrected scene is also exported back into the standard Open3D viewer, so the result can be checked outside
+      the target engine. Verification is part of the pipeline, not a manual afterthought.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="05" title="What this changed about how I debug geometry." id="lessons">
+    <p class="case-lead">
+      Most 3D bugs are convention bugs wearing a disguise. The work made that concrete.
+    </p>
+
+    <ul class="case-list">
+      <li><strong>Probe the target, don't infer it.</strong> A dummy axis object with an identity pose is cheaper than an afternoon of guessing.</li>
+      <li><strong>Check the determinant.</strong> If a transform includes a reflection, a quaternion decomposition is the wrong representation.</li>
+      <li><strong>Bake once, at the boundary.</strong> Apply the compound transform to the geometry and neutralise downstream transforms; hidden layers compound errors.</li>
+      <li><strong>Verify in two viewers.</strong> Open3D is the sanity check. The custom viewer is the actual contract.</li>
+      <li><strong>Separate pivot from pose.</strong> A correct rotation around the wrong centroid is still wrong.</li>
+    </ul>
+
+    <div class="case-links">
+      <a class="btn btn--primary" href="https://github.com/nomadka/pcd_transformation" target="_blank" rel="noreferrer">
+        Repository
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      <a class="btn btn--ghost" href="/work/camera-calibration/">Next: calibration</a>
+    </div>
+  </CaseSection>
+</CaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ba]').forEach((widget) => {
+    const range = widget.querySelector<HTMLInputElement>('[data-ba-range]');
+    if (!range) return;
+    const update = () => widget.style.setProperty('--pos', `${range.value}%`);
+    range.addEventListener('input', update);
+    update();
+  });
+</script>

@@ -1,0 +1,42 @@
+---
+interface MetaItem {
+  label: string;
+  value: string;
+}
+
+interface Props {
+  index: string;
+  category: string;
+  title: string;
+  subtitle: string;
+  meta: MetaItem[];
+}
+
+const { index, category, title, subtitle, meta } = Astro.props;
+---
+
+<header class="case-header">
+  <a class="case-back" href="/work/">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M9.5 2.5 2.5 9.5M8 9.5H2.5V4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    All work
+  </a>
+
+  <div class="case-header__top">
+    <p class="eyebrow">Case study {index} / {category}</p>
+    <span class="mono muted">Selected work</span>
+  </div>
+
+  <h1>{title}</h1>
+  <p class="case-header__sub">{subtitle}</p>
+
+  <dl class="case-meta">
+    {meta.map((item) => (
+      <div>
+        <dt>{item.label}</dt>
+        <dd>{item.value}</dd>
+      </div>
+    ))}
+  </dl>
+</header>

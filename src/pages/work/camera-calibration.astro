@@ -1,0 +1,334 @@
+---
+import CaseLayout from '../../layouts/CaseLayout.astro';
+import CaseSection from '../../components/CaseSection.astro';
+
+const next = {
+  href: '/work/tls-assist/',
+  category: 'Back to the flagship',
+  title: 'TLS-Assist',
+  image: '/images/tlsr-night.webp',
+  alt: 'Night-time CARLA scene with a green traffic light and a natural-language notice',
+};
+
+const errors = [
+  ['fx', '898.70', '900.00', '−1.30'],
+  ['fy', '898.73', '900.00', '−1.27'],
+  ['cx', '638.06', '640.00', '−1.94'],
+  ['cy', '358.51', '360.00', '−1.49'],
+  ['k1', '−0.11912', '−0.12000', '+0.00088'],
+  ['k2', '0.02131', '0.02800', '−0.00669'],
+  ['p1', '0.00043', '0.00060', '−0.00017'],
+  ['p2', '−0.00038', '−0.00020', '−0.00018'],
+];
+---
+
+<CaseLayout
+  title="Camera calibration toolkit"
+  description="A reusable OpenCV calibration module for chessboard intrinsics, lens distortion, undistortion, ROI cropping, and reprojection-error checks — verified against a synthetic camera with known parameters."
+  index="04"
+  category="Perception tooling"
+  subtitle="A camera is a measurement device only if you know its geometry. This toolkit recovers intrinsics and distortion from a chessboard, undistorts images two ways, and scores its own fit."
+  meta={[
+    { label: 'Role', value: 'Tooling · verification' },
+    { label: 'Timeline', value: '2024 – 2026' },
+    { label: 'Type', value: 'Calibration / sensing' },
+    { label: 'Stack', value: 'Python · OpenCV · NumPy' },
+  ]}
+  next={next}
+>
+  <Fragment slot="media">
+    <nav class="case-toc" aria-label="On this page">
+      <a href="#problem">01 / Problem</a>
+      <a href="#toolkit">02 / Toolkit</a>
+      <a href="#verification">03 / Verification</a>
+      <a href="#output">04 / Output</a>
+      <a href="#limits">05 / Limits</a>
+    </nav>
+
+    <figure class="case-lead-media">
+      <div class="figure__media">
+        <img
+          src="/images/calibration-corners.webp"
+          alt="Synthetic checkerboard view with all 54 inner corners detected and drawn in colour"
+          width="1280"
+          height="720"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+      <figcaption>
+        All 54 inner corners detected on a rendered checkerboard. Green and magenta marks show the ordering; the
+        sub-pixel refinement pass runs after this detection.
+      </figcaption>
+    </figure>
+  </Fragment>
+
+  <CaseSection number="01" title="An uncalibrated camera produces confident, wrong geometry." id="problem">
+    <p class="case-lead">
+      Every pixel-to-ray claim depends on the camera matrix and the lens distortion model. If they are unknown, the
+      error is not visible in the image — it is buried in every downstream measurement.
+    </p>
+    <p>
+      That matters more on small sensors and wide lenses, where radial distortion bends straight lines near the frame
+      edge. A detector trained on distorted images can still work; a system that projects a detection into 3D, fuses it
+      with LiDAR, or measures a distance cannot.
+    </p>
+    <p>
+      The task was to build a reusable calibration module rather than a one-off script: detect a chessboard, recover
+      intrinsics and distortion, provide two undistortion paths, crop to a valid region, and report a fit metric that
+      tells the operator whether the result can be trusted.
+    </p>
+    <div class="case-callout">
+      Calibration is not a preprocessing step you run once and forget. It is a measurement with an error budget — and
+      the error budget should be part of the artifact.
+    </div>
+  </CaseSection>
+
+  <CaseSection number="02" title="A short, inspectable calibration path." id="toolkit">
+    <p class="case-lead">
+      The repository keeps the whole workflow in one class. Each stage is visible, so a bad calibration can be traced to
+      detection, coverage, or the optimiser instead of being hidden behind a library call.
+    </p>
+
+    <div class="case-pipeline" aria-label="Camera calibration pipeline">
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">01</span>
+        <div>
+          <h3>Capture</h3>
+          <p>Photograph a 9 × 6 inner-corner chessboard at varied tilts, positions, and distances across the frame.</p>
+          <span class="pipeline-step__meta">1280 × 720 frames · JPEG input</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">02</span>
+        <div>
+          <h3>Detect</h3>
+          <p>Use the sector-based chessboard detector, then refine every corner to sub-pixel accuracy.</p>
+          <span class="pipeline-step__meta">findChessboardCornersSB · cornerSubPix</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">03</span>
+        <div>
+          <h3>Solve</h3>
+          <p>Estimate the camera matrix, five distortion coefficients, and one pose per view.</p>
+          <span class="pipeline-step__meta">calibrateCamera · Levenberg–Marquardt</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">04</span>
+        <div>
+          <h3>Correct</h3>
+          <p>Undistort a still directly, or precompute rectification maps for video and batch processing.</p>
+          <span class="pipeline-step__meta">undistort · initUndistortRectifyMap · remap</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">05</span>
+        <div>
+          <h3>Verify</h3>
+          <p>Reproject every board and report the mean error, so a bad solve is rejected before it reaches perception.</p>
+          <span class="pipeline-step__meta">projectPoints · per-view error</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="case-code">
+      <div class="case-code__bar"><span>camera_calib.py / detect, solve, correct</span><span>Python · OpenCV</span></div>
+      <pre><code><span class="tok-com"># object points live on a flat board: z = 0</span>
+objp = np.zeros((<span class="tok-str">9</span> * <span class="tok-str">6</span>, <span class="tok-str">3</span>), np.float32)
+objp[:, :<span class="tok-str">2</span>] = np.mgrid[<span class="tok-str">0</span>:<span class="tok-str">9</span>, <span class="tok-str">0</span>:<span class="tok-str">6</span>].T.reshape(-<span class="tok-str">1</span>, <span class="tok-str">2</span>)
+
+ret, corners = cv.findChessboardCornersSB(gray, (<span class="tok-str">9</span>, <span class="tok-str">6</span>), <span class="tok-key">None</span>)
+<span class="tok-key">if</span> ret:
+    corners = cv.cornerSubPix(gray, corners, (<span class="tok-str">11</span>, <span class="tok-str">11</span>), (-<span class="tok-str">1</span>, -<span class="tok-str">1</span>), criteria)
+    obj_points.append(objp)
+    img_points.append(corners)
+
+rms, K, D, rvecs, tvecs = cv.calibrateCamera(
+    obj_points, img_points, (<span class="tok-str">1280</span>, <span class="tok-str">720</span>), <span class="tok-key">None</span>, <span class="tok-key">None</span>
+)
+
+<span class="tok-com"># precompute maps once for video; do not rebuild them per frame</span>
+newK, roi = cv.getOptimalNewCameraMatrix(K, D, (<span class="tok-str">1280</span>, <span class="tok-str">720</span>), <span class="tok-str">1</span>, (<span class="tok-str">1280</span>, <span class="tok-str">720</span>))
+mapx, mapy = cv.initUndistortRectifyMap(K, D, <span class="tok-key">None</span>, newK, (<span class="tok-str">1280</span>, <span class="tok-str">720</span>), cv.CV_32FC1)
+clean = cv.remap(frame, mapx, mapy, cv.INTER_LINEAR)
+
+<span class="tok-com"># crop the invalid border, then keep newK with the cropped images</span>
+x, y, w, h = roi
+clean = clean[y:y + h, x:x + w]</code></pre>
+    </div>
+    <p class="case-note">
+      The repository uses <code>findChessboardCornersSB</code> followed by <code>cornerSubPix</code>, and exposes both
+      <code>undistort</code> and <code>remap</code> paths. The snippet is condensed for readability.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="03" title="A calibration you can grade against ground truth." id="verification">
+    <p class="case-lead">
+      The original calibration images were not kept with the repository. Rather than invent a real-camera result, I
+      rendered 26 checkerboard views with a <em>known</em> camera matrix and lens distortion, then ran the same detection
+      and calibration code against them.
+    </p>
+    <p>
+      That turns calibration into a testable problem. A real camera has no absolute reference for K and D; a synthetic
+      rig does. The run verifies the code path, the coordinate conventions, and whether the optimiser recovers the
+      parameters it should. It is <strong>not</strong> a claim about a physical camera.
+    </p>
+
+    <div class="case-metrics">
+      <div class="case-metric">
+        <strong>0.378 px</strong>
+        <span>mean reprojection error · 26 views</span>
+      </div>
+      <div class="case-metric">
+        <strong>26 / 26</strong>
+        <span>rendered boards detected</span>
+      </div>
+      <div class="case-metric">
+        <strong>≤ 1.9 px</strong>
+        <span>intrinsic error vs known ground truth</span>
+      </div>
+    </div>
+
+    <table class="case-table case-table--numbers">
+      <caption>Synthetic verification · recovered parameters vs known ground truth</caption>
+      <thead>
+        <tr><th scope="col">Parameter</th><th scope="col">Recovered</th><th scope="col">Truth</th><th scope="col">Δ</th></tr>
+      </thead>
+      <tbody>
+        {errors.map(([name, recovered, truth, delta]) => (
+          <tr>
+            <td>{name}</td>
+            <td>{recovered}</td>
+            <td>{truth}</td>
+            <td>{delta}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="case-note">
+      Truth: fx = fy = 900, cx = 640, cy = 360, k1 = −0.12, k2 = 0.028, p1 = 0.0006, p2 = −0.0002. The verification run
+      fixes k3 at zero (<code>CALIB_FIX_K3</code>) because 26 near-planar views do not constrain the fifth coefficient
+      reliably; the reference model also has k3 = 0. The repository's production path lets OpenCV estimate all five.
+    </p>
+
+    <div class="case-callout">
+      A reprojection error below half a pixel is a good fit, not proof of a good calibration. The parameters also need
+      to be close to the truth, stable across views, and useful on held-out images. The synthetic rig checks all four.
+    </div>
+  </CaseSection>
+
+  <CaseSection number="04" title="The output is an image you can measure." id="output">
+    <p class="case-lead">
+      Undistortion should make straight lines straight and preserve the geometry the rest of the stack depends on. The
+      crop removes the invalid border; the new camera matrix travels with the cropped image.
+    </p>
+
+    <div class="case-pair">
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/calibration-before.webp" alt="Synthetic chessboard image with visible barrel distortion before correction" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Before: the rendered board with known barrel distortion.</figcaption>
+      </figure>
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/calibration-after.webp" alt="The same chessboard after undistortion and ROI cropping, with straighter edges" width="1280" height="720" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>After: <code>undistort</code> with the optimal new camera matrix, cropped to the valid ROI.</figcaption>
+      </figure>
+    </div>
+
+    <p>
+      The implementation exposes both correction paths for a reason. <code>cv.undistort</code> is the shortest route for
+      a single image. <code>initUndistortRectifyMap</code> plus <code>cv.remap</code> pays the map construction once and
+      then reuses it for every frame — the right choice for video, where rebuilding the map per frame is wasted work.
+    </p>
+    <p>
+      The ROI crop is a quiet contract change. Once an image is cropped, the original principal point is no longer in
+      the same place relative to the pixels. The cropped image needs the <strong>optimal new camera matrix</strong>, not
+      the original K, or every projection afterwards is offset by the crop.
+    </p>
+
+    <div class="case-code">
+      <div class="case-code__bar"><span>reprojection_error / the check that closes the loop</span><span>Python</span></div>
+      <pre><code>mean_error = <span class="tok-str">0</span>
+<span class="tok-key">for</span> i <span class="tok-key">in</span> range(len(obj_points)):
+    projected, _ = cv.projectPoints(obj_points[i], rvecs[i], tvecs[i], K, D)
+    delta = img_points[i].reshape(-<span class="tok-str">1</span>, <span class="tok-str">2</span>) - projected.reshape(-<span class="tok-str">1</span>, <span class="tok-str">2</span>)
+    mean_error += np.mean(np.linalg.norm(delta, axis=<span class="tok-str">1</span>))
+
+mean_error /= len(obj_points)
+<span class="tok-key">print</span>(<span class="tok-str">f"mean reprojection error: &#123;mean_error:.4f&#125; px"</span>)</code></pre>
+    </div>
+    <p class="case-note">
+      The repository's original check uses OpenCV's L2 norm divided by the number of points. The verification script uses
+      the mean per-corner Euclidean distance, which is easier to read in pixels. Both are reported here for
+      transparency.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="05" title="What the toolkit does not solve yet." id="limits">
+    <p class="case-lead">
+      This is a solid single-camera calibration baseline. It is not a full multi-sensor calibration system, and the
+      verification has a narrower scope than production use.
+    </p>
+
+    <ul class="case-list">
+      <li><strong>No real-camera ground truth.</strong> The synthetic run proves the code path; a physical camera still needs a real capture set and a downstream check.</li>
+      <li><strong>Coverage matters more than view count.</strong> Twenty-six views clustered in the centre of the frame are worse than twelve spread across corners, tilts, and depths. The next version should score coverage, not just count images.</li>
+      <li><strong>No stereo or extrinsics.</strong> Camera-to-camera and camera-to-LiDAR transforms are a separate problem: hand-eye calibration, time alignment, and a shared target.</li>
+      <li><strong>Distortion model is fixed.</strong> A five-coefficient Brown–Conrady model is a good default, not a universal fit. Fisheye lenses need a different model.</li>
+      <li><strong>No temporal stability check.</strong> A calibration that drifts after a bump is worse than one that fails loudly. Re-projecting a fixed target over time would catch it.</li>
+      <li><strong>UI is terminal-first.</strong> The class prints matrices and errors. A small report — coverage heatmap, per-view errors, before/after overlay — would make it easier to operate.</li>
+    </ul>
+
+    <div class="case-links">
+      <a class="btn btn--primary" href="https://github.com/nomadka/camera_caliberation" target="_blank" rel="noreferrer">
+        Repository
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      <a class="btn btn--ghost" href="/work/">All case studies</a>
+    </div>
+    <p class="case-note">
+      Verification artifacts: 26 rendered views, 26 detected, one known camera. Source images, metrics, and the
+      verification script are kept with the project so the numbers can be reproduced.
+    </p>
+  </CaseSection>
+</CaseLayout>
+
+<style>
+  .case-table--numbers th:nth-child(2),
+  .case-table--numbers th:nth-child(3),
+  .case-table--numbers th:nth-child(4),
+  .case-table--numbers td:nth-child(2),
+  .case-table--numbers td:nth-child(3),
+  .case-table--numbers td:nth-child(4) {
+    width: 18%;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-align: right;
+  }
+
+  .case-table--numbers td:nth-child(2) {
+    color: var(--amber);
+  }
+
+  .case-table--numbers td:nth-child(4) {
+    color: var(--muted-2);
+  }
+
+  @media (max-width: 560px) {
+    .case-table--numbers th:nth-child(2),
+    .case-table--numbers th:nth-child(3),
+    .case-table--numbers th:nth-child(4),
+    .case-table--numbers td:nth-child(2),
+    .case-table--numbers td:nth-child(3),
+    .case-table--numbers td:nth-child(4) {
+      font-size: 10px;
+    }
+  }
+</style>

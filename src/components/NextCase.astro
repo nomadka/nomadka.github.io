@@ -1,0 +1,27 @@
+---
+interface Props {
+  href: string;
+  category: string;
+  title: string;
+  image: string;
+  alt: string;
+}
+
+const { href, category, title, image, alt } = Astro.props;
+---
+
+<a class="next-case" href={href}>
+  <div class="next-case__media">
+    <img src={image} alt={alt} loading="lazy" decoding="async" />
+  </div>
+  <div class="next-case__body">
+    <span class="mono muted">Next case study / {category}</span>
+    <h2>{title}</h2>
+    <span class="link-arrow">
+      Continue
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </span>
+  </div>
+</a>

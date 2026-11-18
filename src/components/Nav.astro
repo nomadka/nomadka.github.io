@@ -1,0 +1,51 @@
+---
+const path = Astro.url.pathname;
+const isWork = path.startsWith('/work');
+const isResearch = path.startsWith('/research');
+const isAbout = path.startsWith('/about');
+---
+
+<header class="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="/" aria-label="Noushiq Kayilan — home">
+        <span class="brand-mark" aria-hidden="true">NK</span>
+        <span class="brand-name">Noushiq Kayilan <span>/ CV</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="/work/" aria-current={isWork ? 'page' : undefined}>Work</a></li>
+        <li><a href="/research/" aria-current={isResearch ? 'page' : undefined}>Research</a></li>
+        <li><a href="/about/" aria-current={isAbout ? 'page' : undefined}>About</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+
+      <a class="nav-cta" href="/#contact">
+        Let's talk
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu" data-nav-toggle>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" data-mobile-menu data-open="false">
+  <ol>
+    <li><a href="/work/" aria-current={isWork ? 'page' : undefined}>Work <span>01</span></a></li>
+    <li><a href="/research/" aria-current={isResearch ? 'page' : undefined}>Research <span>02</span></a></li>
+    <li><a href="/about/" aria-current={isAbout ? 'page' : undefined}>About <span>03</span></a></li>
+    <li><a href="/#contact">Contact <span>04</span></a></li>
+  </ol>
+  <div class="mobile-menu__meta">
+    <a href="mailto:noushikayilan@gmail.com">noushikayilan@gmail.com</a>
+    <a href="https://github.com/nomadka" target="_blank" rel="noreferrer">GitHub ↗</a>
+    <a href="https://www.linkedin.com/in/noushiq" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+  </div>
+</div>

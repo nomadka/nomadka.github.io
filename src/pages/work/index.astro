@@ -1,0 +1,594 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const cases = [
+  {
+    href: '/work/tls-assist/',
+    index: '01',
+    category: 'Research · Autonomous driving',
+    title: 'TLS-Assist',
+    description:
+      'A modular traffic light and sign perception layer for LLM-based driving agents. It detects the relevant signal, validates its state over time, and injects a structured language message into the planner.',
+    proof: '+14%',
+    proofLabel: 'relative driving performance vs LMDrive, with fewer traffic-rule infractions.',
+    image: '/images/tlsr-stop.webp',
+    alt: 'CARLA scene approaching a stop sign with multi-view cameras and a traffic-sign notice',
+    tags: ['IEEE IV 2026', 'YOLO11', 'CARLA', 'PyTorch'],
+    badge: 'Flagship / peer-reviewed',
+  },
+  {
+    href: '/work/wood-defects/',
+    index: '02',
+    category: 'Applied CV · Manufacturing',
+    title: 'Wood surface defect detection',
+    description:
+      'An end-to-end YOLO pipeline that takes a public Kaggle dataset from raw labels to training, validation, image inference, and live inference on YouTube streams.',
+    proof: '0.626',
+    proofLabel: 'mAP50 at the best checkpoint across eight defect classes — with the hard classes left visible.',
+    image: '/images/wood-card.webp',
+    alt: 'Wood defect detection contact sheet with detections on planks and four validation crops',
+    tags: ['YOLO', 'OpenCV', 'yt-dlp', 'Kaggle'],
+    badge: 'Applied pipeline',
+  },
+  {
+    href: '/work/point-clouds/',
+    index: '03',
+    category: '3D geometry · Reconstruction',
+    title: 'Point-cloud alignment',
+    description:
+      'Three point-cloud sets, one custom viewer with an undocumented coordinate convention. The work was reverse-engineering the transform — including the reflections a quaternion cannot represent.',
+    proof: '3 → 1',
+    proofLabel: 'point-cloud sets brought into one consistent world frame, with an identity trajectory.',
+    image: '/images/pcd-card.webp',
+    alt: 'Aligned point cloud in a custom viewer with a raw misaligned inset and XYZ axes',
+    tags: ['Open3D', 'NumPy', 'Python', 'Transforms'],
+    badge: 'Geometry debug',
+  },
+  {
+    href: '/work/camera-calibration/',
+    index: '04',
+    category: 'Tooling · Sensing',
+    title: 'Camera calibration toolkit',
+    description:
+      'A reusable OpenCV module for chessboard calibration: intrinsics, distortion, two undistortion paths, ROI cropping, and a reprojection-error check.',
+    proof: 'K + D',
+    proofLabel: 'camera matrix and distortion model, with undistortion and reprojection error in one script.',
+    image: '/images/calibration-target.webp',
+    alt: 'Illustration of a checkerboard calibration target with coordinate axes and measurement grid',
+    tags: ['OpenCV', 'Calibration', 'NumPy', 'Python'],
+    badge: 'Perception tooling',
+  },
+];
+
+const experiments = [
+  {
+    index: '01',
+    title: 'micro_pen',
+    kind: 'Local AI / RAG',
+    description:
+      'A local document assistant that answers questions across embedded PDFs and DOCX files. LangChain handles retrieval, Chroma stores the vectors, and Ollama runs the model on-device.',
+    tags: ['LangChain', 'Chroma', 'Ollama'],
+    href: 'https://github.com/nomadka/micro_pen',
+  },
+  {
+    index: '02',
+    title: 'ACF video detector',
+    kind: 'Classical CV / MATLAB',
+    description:
+      'A MATLAB Aggregate Channel Features detector trained on 143 annotated UCF101 frames to find and follow a bowling ball across video — a small study in tracking before deep learning.',
+    tags: ['MATLAB', 'ACF', 'Tracking'],
+    href: 'https://github.com/nomadka/videoDetector_v1.0',
+  },
+  {
+    index: '03',
+    title: 'Detector training sweeps',
+    kind: 'Internal research',
+    description:
+      'Fine-tuning and k-fold cross-validation runs across CARLA, GTSRB, and TSCD detection datasets, with per-fold metrics and failure analysis. Kept private while the work is active.',
+    tags: ['YOLO11x', 'k-fold', 'W&B'],
+    href: null,
+  },
+];
+---
+
+<BaseLayout
+  title="Work"
+  description="Computer vision case studies: LLM-based autonomous driving, wood surface defect detection, point-cloud alignment, and camera calibration."
+>
+  <header class="work-hero">
+    <div class="container">
+      <div class="work-hero__top">
+        <p class="eyebrow">Work index / 2024–2026</p>
+        <span class="mono muted">Selected + applied</span>
+      </div>
+
+      <h1>Four ways of making the world <em>legible.</em></h1>
+
+      <div class="work-hero__grid">
+        <p class="work-hero__lead">
+          Perception systems for driving, manufacturing, and 3D geometry. Each case study starts with a failure mode,
+          explains the engineering, and ends with evidence — including the parts that did not work.
+        </p>
+        <dl class="work-hero__stats">
+          <div><dt>Case studies</dt><dd>04</dd></div>
+          <div><dt>Publication</dt><dd>IEEE IV 2026</dd></div>
+          <div><dt>Sensing</dt><dd>Camera · LiDAR · sim</dd></div>
+        </dl>
+      </div>
+
+      <nav class="work-jump" aria-label="Case studies">
+        <a href="#tls-assist"><span>01</span> TLS-Assist</a>
+        <a href="#wood-defects"><span>02</span> Wood defects</a>
+        <a href="#point-clouds"><span>03</span> Point clouds</a>
+        <a href="#camera-calibration"><span>04</span> Calibration</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="work-list" aria-label="Case studies">
+    <div class="container">
+      {cases.map((item, i) => (
+        <a class="case-row reveal" href={item.href} id={item.href.split('/').filter(Boolean).pop()}>
+          <div class="case-row__media">
+            <img src={item.image} alt={item.alt} width="1200" height="900" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+            <span class="case-row__badge">{item.badge}</span>
+          </div>
+          <div class="case-row__body">
+            <div class="case-row__meta">
+              <span class="mono accent">{item.index}</span>
+              <span class="mono muted">{item.category}</span>
+            </div>
+            <h2>{item.title}</h2>
+            <p>{item.description}</p>
+            <div class="case-row__proof">
+              <strong>{item.proof}</strong>
+              <span>{item.proofLabel}</span>
+            </div>
+            <ul class="tag-list">
+              {item.tags.map((tag) => <li class="tag">{tag}</li>)}
+            </ul>
+            <span class="link-arrow">
+              Read the case study
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section section--line experiments" aria-labelledby="experiments-title">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <p class="eyebrow reveal">Also in the lab</p>
+          <h2 class="section-title reveal" id="experiments-title" style="--delay: 60ms">
+            Smaller experiments, <em>same instinct.</em>
+          </h2>
+        </div>
+        <p class="section-note reveal" style="--delay: 120ms">
+          Prototypes and side studies that sharpen the main work: retrieval, classical tracking, and the unglamorous
+          business of training and validating detectors.
+        </p>
+      </div>
+
+      <div class="experiment-grid">
+        {experiments.map((item, i) => (
+          <article class="experiment reveal" style={`--delay: ${i * 70}ms`}>
+            <div class="experiment__head">
+              <span class="mono accent">{item.index}</span>
+              <span class="mono muted">{item.kind}</span>
+            </div>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+            <ul class="tag-list">
+              {item.tags.map((tag) => <li class="tag">{tag}</li>)}
+            </ul>
+            {item.href ? (
+              <a class="link-arrow experiment__link" href={item.href} target="_blank" rel="noreferrer">
+                Repository
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </a>
+            ) : (
+              <span class="experiment__note">Private while active</span>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="work-cta">
+    <div class="container work-cta__inner">
+      <div>
+        <p class="eyebrow reveal">Next</p>
+        <h2 class="reveal" style="--delay: 60ms">Have a perception problem that needs <em>unpacking?</em></h2>
+      </div>
+      <div class="work-cta__actions reveal" style="--delay: 120ms">
+        <a class="btn btn--primary" href="/#contact">
+          Start a conversation
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="btn btn--ghost" href="/research/">Research &amp; publication</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .work-hero {
+    padding-top: clamp(126px, 15vw, 178px);
+    padding-bottom: clamp(44px, 6vw, 68px);
+  }
+
+  .work-hero__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+
+  .work-hero h1 {
+    max-width: 13ch;
+    margin-top: 26px;
+    font-family: var(--font-serif);
+    font-size: clamp(3.4rem, 8vw, 7.8rem);
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .work-hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .work-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: end;
+    margin-top: clamp(30px, 4vw, 46px);
+  }
+
+  .work-hero__lead {
+    max-width: 58ch;
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .work-hero__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin: 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .work-hero__stats dt {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .work-hero__stats dd {
+    margin: 6px 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.35rem, 2vw, 1.8rem);
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .work-jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px 28px;
+    margin-top: clamp(34px, 5vw, 54px);
+    padding-block: 16px;
+    border-block: 1px solid var(--line);
+  }
+
+  .work-jump a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.2s var(--ease);
+  }
+
+  .work-jump a:hover {
+    color: var(--amber);
+  }
+
+  .work-jump span {
+    font-size: 8px;
+    color: var(--muted-2);
+  }
+
+  .work-list {
+    padding-bottom: clamp(20px, 3vw, 34px);
+  }
+
+  .case-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(26px, 5vw, 64px);
+    align-items: center;
+    padding-block: clamp(30px, 4vw, 50px);
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 100px;
+  }
+
+  .case-row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .case-row:nth-child(even) .case-row__media {
+    order: 2;
+  }
+
+  .case-row__media {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    aspect-ratio: 4 / 3;
+    background: var(--ink-2);
+  }
+
+  .case-row__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(7, 9, 12, 0.3));
+    pointer-events: none;
+  }
+
+  .case-row__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease), filter 0.8s var(--ease);
+  }
+
+  .case-row:hover .case-row__media img {
+    transform: scale(1.025);
+    filter: saturate(1.06);
+  }
+
+  .case-row__badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 1;
+    padding: 5px 8px;
+    border: 1px solid rgba(255, 181, 71, 0.35);
+    border-radius: 3px;
+    background: rgba(7, 9, 12, 0.68);
+    backdrop-filter: blur(8px);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+
+  .case-row__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .case-row__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .case-row h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.3rem, 4vw, 3.8rem);
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+  }
+
+  .case-row p {
+    max-width: 52ch;
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .case-row__proof {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding-block: 12px;
+    border-block: 1px solid var(--line);
+  }
+
+  .case-row__proof strong {
+    flex: none;
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1;
+    color: var(--amber);
+  }
+
+  .case-row__proof span {
+    max-width: 34ch;
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .case-row .tag-list {
+    margin-top: 2px;
+  }
+
+  .case-row .link-arrow {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
+  .section-note {
+    max-width: 38ch;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .experiment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .experiment {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.006));
+  }
+
+  .experiment__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .experiment h3 {
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+    line-height: 1;
+  }
+
+  .experiment p {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .experiment .tag-list {
+    margin-top: 2px;
+  }
+
+  .experiment__link {
+    align-self: flex-start;
+    margin-top: 6px;
+  }
+
+  .experiment__note {
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .work-cta {
+    padding-block: clamp(64px, 9vw, 110px);
+    border-top: 1px solid var(--line);
+  }
+
+  .work-cta__inner {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .work-cta h2 {
+    max-width: 18ch;
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 5vw, 4.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+  }
+
+  .work-cta h2 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .work-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 980px) {
+    .work-hero__grid,
+    .case-row {
+      grid-template-columns: 1fr;
+    }
+
+    .case-row:nth-child(even) .case-row__media {
+      order: 0;
+    }
+
+    .case-row__media {
+      aspect-ratio: 16 / 10;
+    }
+
+    .experiment-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .work-cta__inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .work-hero h1 {
+      max-width: 100%;
+    }
+
+    .work-hero__stats {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .work-hero__stats div {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .experiment-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

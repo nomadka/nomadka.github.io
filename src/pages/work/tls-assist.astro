@@ -1,0 +1,353 @@
+---
+import CaseLayout from '../../layouts/CaseLayout.astro';
+import CaseSection from '../../components/CaseSection.astro';
+
+const next = {
+  href: '/work/wood-defects/',
+  category: 'Applied CV',
+  title: 'Wood surface defect detection',
+  image: '/images/wood-detection.webp',
+  alt: 'Wood plank with YOLO detection boxes around surface defects',
+};
+---
+
+<CaseLayout
+  title="TLS-Assist"
+  description="A modular traffic light and sign recognition layer for LLM-based autonomous driving, published at IEEE IV 2026."
+  index="01"
+  category="Research + engineering"
+  subtitle="Giving an LLM driver explicit traffic-rule perception: how a modular layer for traffic lights and signs improved closed-loop driving performance in CARLA."
+  meta={[
+    { label: 'Role', value: 'Perception research · co-author' },
+    { label: 'Timeline', value: '2025 – 2026' },
+    { label: 'Venue', value: 'IEEE IV 2026' },
+    { label: 'Stack', value: 'PyTorch · YOLO11 · CARLA · LMDrive · BEVDriver' },
+  ]}
+  next={next}
+>
+  <Fragment slot="media">
+    <nav class="case-toc" aria-label="On this page">
+      <a href="#problem">01 / Problem</a>
+      <a href="#approach">02 / Approach</a>
+      <a href="#evidence">03 / Evidence</a>
+      <a href="#notes">04 / Engineering notes</a>
+      <a href="#publication">05 / Publication</a>
+    </nav>
+
+    <figure class="case-lead-media">
+      <div class="figure__media">
+        <img
+          src="/images/tlsr-night.webp"
+          alt="Night-time CARLA scene with a green traffic light, three camera views, and a natural-language traffic-light notice"
+          width="1200"
+          height="900"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+      <figcaption>
+        Closed-loop CARLA evaluation. The perception layer converts a green light into a structured notice — “Green signal, get ready and go ahead” — for the LLM planner.
+      </figcaption>
+    </figure>
+  </Fragment>
+
+  <CaseSection number="01" title="An LLM can reason about the route. It cannot reliably see the light." id="problem">
+    <p class="case-lead">
+      LLM-based driving agents brought a new kind of reasoning to autonomous driving. They also inherited a very old perception problem.
+    </p>
+    <p>
+      LMDrive and similar systems combine camera input with natural-language instructions. The planner can reason about a route, but small, safety-critical objects — traffic lights and signs — are easy to miss and easy to misread. In CARLA's LangAuto benchmark, that showed up as a disproportionate number of traffic-light and sign infractions.
+    </p>
+    <p>
+      Adding more capacity to the planner does not fix a missing observation. The missing piece was an explicit perception layer that could answer three questions reliably: <strong>Is there a relevant traffic light or sign? What state is it in? How do we tell the planner in language it already understands?</strong>
+    </p>
+    <div class="case-callout">
+      The goal was not a new planner. It was a modular redundancy layer that made traffic rules explicit in the prompt — without changing the driving agent's underlying architecture.
+    </div>
+  </CaseSection>
+
+  <CaseSection number="02" title="A modular redundancy layer, not a black box." id="approach">
+    <p class="case-lead">
+      TLS-Assist sits beside the driving agent. Multi-view images go in; structured traffic-rule messages come out.
+    </p>
+
+    <div class="case-pipeline" aria-label="TLS-Assist pipeline">
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">01</span>
+        <div>
+          <h3>Multi-view input</h3>
+          <p>Left, focus, and right camera views from the CARLA ego vehicle, supporting both single-view and multi-view configurations.</p>
+          <span class="pipeline-step__meta">CARLA · RGB cameras</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">02</span>
+        <div>
+          <h3>Traffic light &amp; sign detection</h3>
+          <p>YOLO11 detectors pre-trained on real-world data, then fine-tuned inside CARLA. A dedicated traffic-sign dataset was prepared for the sign model.</p>
+          <span class="pipeline-step__meta">PyTorch · YOLO11 · transfer learning</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">03</span>
+        <div>
+          <h3>Relevance prediction</h3>
+          <p>Not every light in frame applies to the ego vehicle. The relevance module selects the traffic light that matters for the current lane and approach.</p>
+          <span class="pipeline-step__meta">Geometry · ego-vehicle context</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">04</span>
+        <div>
+          <h3>State validation</h3>
+          <p>A temporal buffer and consistency check suppress flicker and reduce the chance of acting on a single misclassified frame.</p>
+          <span class="pipeline-step__meta">Temporal reasoning · heuristics</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">05</span>
+        <div>
+          <h3>Message generator</h3>
+          <p>Detections and validated states become structured natural-language notices, injected directly into the LLM prompt.</p>
+          <span class="pipeline-step__meta">Structured language · prompt injection</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">06</span>
+        <div>
+          <h3>LLM planner</h3>
+          <p>LMDrive or BEVDriver consumes the notice and produces the next driving action. The layer is plug-and-play and model-agnostic.</p>
+          <span class="pipeline-step__meta">LMDrive · BEVDriver · LangAuto</span>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      The design deliberately keeps the agent unchanged. TLS-Assist is a perception sidecar: it can be dropped into any CARLA-based, language-conditioned driving stack that accepts image input and natural-language instructions. That constraint made the work harder to tune, but much easier to reuse.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="03" title="The metric that matters is driving behaviour." id="evidence">
+    <p class="case-lead">
+      Detection accuracy is necessary, but not sufficient. The system was evaluated in closed-loop simulation, where a missed light becomes an infraction and a wrong state becomes a manoeuvre.
+    </p>
+
+    <div class="case-metrics">
+      <div class="case-metric">
+        <strong>+14%</strong>
+        <span>relative driving performance vs LMDrive</span>
+      </div>
+      <div class="case-metric">
+        <strong>+7%</strong>
+        <span>relative driving performance vs BEVDriver</span>
+      </div>
+      <div class="case-metric">
+        <strong>Fewer</strong>
+        <span>traffic-light and sign infractions across routes</span>
+      </div>
+    </div>
+
+    <p>
+      The published results report relative driving-performance improvements of up to <strong>14% over LMDrive</strong> and <strong>7% over BEVDriver</strong>, alongside a consistent reduction in traffic-light and sign infractions. Those numbers come from the IEEE IV 2026 paper.
+    </p>
+
+    <p>
+      The master's thesis contains a deeper route-level evaluation. On the LangAuto Long route set, the red-light score dropped from <strong>9.7 to 3.8</strong>, and the infraction score rose from <strong>0.73 to 0.77</strong>. On the Tiny and Short sets, the improvements were smaller — a useful reminder that context and route difficulty matter.
+    </p>
+
+    <div class="case-gallery">
+      <figure class="case-figure">
+        <div class="figure__media">
+          <img src="/images/red-light-score.png" alt="Chart comparing red-light scores for LMDrive and TLS-Assist across Tiny, Short, and Long route sets" width="1485" height="874" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Red-light score by route set. Lower is better; the largest reduction appears on the Long set (9.7 → 3.8).</figcaption>
+      </figure>
+      <figure class="case-figure">
+        <div class="figure__media">
+          <img src="/images/infraction-score.png" alt="Chart comparing infraction scores for LMDrive, TLR, TSR, and TLS-Assist across Tiny, Short, and Long route sets" width="1485" height="863" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Infraction score by route set. Higher is better; TLS-Assist tracks or improves on LMDrive across all three sets.</figcaption>
+      </figure>
+    </div>
+    <p class="case-note">
+      Thesis results and paper results come from different evaluation runs. They are presented as complementary evidence, not as a single leaderboard.
+    </p>
+
+    <div class="case-gallery">
+      <figure class="case-figure">
+        <div class="figure__media">
+          <img src="/images/tlsr-night.webp" alt="Night driving scene with a green traffic light and a natural-language traffic-light notice" width="1200" height="900" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Traffic-light state converted into a natural-language notice for the planner.</figcaption>
+      </figure>
+      <figure class="case-figure">
+        <div class="figure__media">
+          <img src="/images/tlsr-stop.webp" alt="Daytime CARLA scene approaching a stop sign with a traffic-sign notice" width="1200" height="900" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Traffic-sign recognition in a daytime route: “Be mindful of stop sign.”</figcaption>
+      </figure>
+    </div>
+  </CaseSection>
+
+  <CaseSection number="04" title="What was hard — and what I would change." id="notes">
+    <p class="case-lead">
+      The interesting engineering was not the happy path. It was the failure modes that only appear when perception, language, and simulation meet.
+    </p>
+
+    <div class="notes-grid">
+      <div class="note-card">
+        <h3>Two detectors, one compute budget</h3>
+        <p>Separate traffic-light and traffic-sign models are simple to reason about, but expensive next to an LLM and a vision encoder. A shared backbone — or reuse of the agent's vision features — is the obvious next step.</p>
+      </div>
+      <div class="note-card">
+        <h3>Heuristics before learned modules</h3>
+        <p>Relevance prediction and state validation were deliberately heuristic baselines. They are interpretable and cheap, but a learned or probabilistic alternative could handle occlusions and unusual junctions better.</p>
+      </div>
+      <div class="note-card">
+        <h3>Simulation is noisy</h3>
+        <p>CARLA's dynamics and the LLM's sensitivity to prompt wording introduce run-to-run variance. The evaluation spans multiple route sets for that reason; a single run would overstate the result.</p>
+      </div>
+      <div class="note-card">
+        <h3>Modularity is a feature</h3>
+        <p>The layer is model-agnostic and works with single- or multi-view cameras. That reusability is what made integration with both LMDrive and BEVDriver practical.</p>
+      </div>
+    </div>
+  </CaseSection>
+
+  <CaseSection number="05" title="Publication, code, and models." id="publication">
+    <p class="case-lead">
+      The work is public: paper, integration code, and fine-tuned models for both driving agents.
+    </p>
+
+    <div class="publication-card">
+      <span class="mono accent">IEEE Intelligent Vehicles Symposium 2026</span>
+      <h3>Enhancing LLM-based Autonomous Driving with Modular Traffic Light and Sign Recognition</h3>
+      <p class="publication-authors">
+        Fabian Schmidt · <strong>Noushiq Mohammed Kayilan Abdul Nazar</strong> · Markus Enzweiler · Abhinav Valada
+      </p>
+      <p class="publication-affiliation">
+        Esslingen University of Applied Sciences · University of Freiburg
+      </p>
+      <p>
+        TLS-Assist is a modular redundancy layer for LLM-based driving agents. It detects traffic lights and signs, selects the relevant signal, validates its state over time, and converts the result into structured natural language for the planner.
+      </p>
+      <div class="case-links">
+        <a class="btn btn--primary" href="https://arxiv.org/abs/2511.14391" target="_blank" rel="noreferrer">
+          arXiv paper
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="btn btn--ghost" href="https://github.com/iis-esslingen/TLS-Assist" target="_blank" rel="noreferrer">Code</a>
+        <a class="btn btn--ghost" href="https://huggingface.co/iis-esslingen/TLS-Assist" target="_blank" rel="noreferrer">Models</a>
+        <a class="btn btn--ghost" href="/research/">Research page</a>
+      </div>
+      <p class="case-note">Code and models are released by the Institute for Intelligent Systems (IIS).</p>
+    </div>
+  </CaseSection>
+</CaseLayout>
+
+<style>
+  .case-toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 30px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .case-toc a {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    transition: color 0.2s var(--ease);
+  }
+
+  .case-toc a:hover {
+    color: var(--amber);
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .note-card {
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .note-card h3 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+
+  .note-card p {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .publication-card {
+    margin-top: 26px;
+    padding: clamp(20px, 3vw, 30px);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(180deg, rgba(255, 181, 71, 0.06), rgba(255, 255, 255, 0.015));
+  }
+
+  .publication-card h3 {
+    max-width: 30ch;
+    margin-top: 12px;
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    line-height: 1.03;
+    letter-spacing: -0.02em;
+  }
+
+  .publication-authors {
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .publication-authors strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .publication-affiliation {
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .publication-card > p:not(.publication-authors):not(.publication-affiliation):not(.case-note) {
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  @media (max-width: 700px) {
+    .notes-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

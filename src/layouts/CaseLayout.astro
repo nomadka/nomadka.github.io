@@ -1,0 +1,45 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import CaseHeader from '../components/CaseHeader.astro';
+import NextCase from '../components/NextCase.astro';
+import '../styles/case.css';
+
+interface MetaItem {
+  label: string;
+  value: string;
+}
+
+interface NextItem {
+  href: string;
+  category: string;
+  title: string;
+  image: string;
+  alt: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  index: string;
+  category: string;
+  subtitle: string;
+  meta: MetaItem[];
+  next: NextItem;
+}
+
+const { title, description, image = '/og.png', index, category, subtitle, meta, next } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={image} type="article">
+  <article class="case">
+    <div class="container">
+      <CaseHeader index={index} category={category} title={title} subtitle={subtitle} meta={meta} />
+      <slot name="media" />
+      <div class="case-body">
+        <slot />
+      </div>
+      <NextCase {...next} />
+    </div>
+  </article>
+</BaseLayout>

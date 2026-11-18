@@ -1,0 +1,284 @@
+---
+import CaseLayout from '../../layouts/CaseLayout.astro';
+import CaseSection from '../../components/CaseSection.astro';
+
+const next = {
+  href: '/work/point-clouds/',
+  category: '3D geometry',
+  title: 'Point-cloud alignment',
+  image: '/images/pcd-card.webp',
+  alt: 'Aligned point cloud inside a custom viewer with a raw misaligned inset',
+};
+
+const classes: Array<[string, number]> = [
+  ['Marrow', 0.927],
+  ['dead_knot', 0.784],
+  ['live_knot', 0.693],
+  ['resin', 0.680],
+  ['knot_missing', 0.648],
+  ['crack', 0.553],
+  ['knot_with_crack', 0.417],
+  ['quartzity', 0.308],
+];
+---
+
+<CaseLayout
+  title="Wood surface defect detection"
+  description="An end-to-end YOLO pipeline for wood surface defects: dataset preparation, training, validation, per-class failure analysis, and live video inference."
+  index="02"
+  category="Applied computer vision"
+  subtitle="A full inspection pipeline for a natural material: eight defect classes, a long-tailed dataset, and the honest version of what the detector gets right."
+  meta={[
+    { label: 'Role', value: 'Pipeline design · training · evaluation' },
+    { label: 'Timeline', value: '2025' },
+    { label: 'Type', value: 'Applied CV / manufacturing' },
+    { label: 'Stack', value: 'Ultralytics YOLO · OpenCV · yt-dlp · Kaggle' },
+  ]}
+  next={next}
+>
+  <Fragment slot="media">
+    <nav class="case-toc" aria-label="On this page">
+      <a href="#problem">01 / Problem</a>
+      <a href="#pipeline">02 / Pipeline</a>
+      <a href="#results">03 / Results</a>
+      <a href="#failures">04 / Failure analysis</a>
+      <a href="#next">05 / What I'd change</a>
+    </nav>
+
+    <figure class="case-lead-media">
+      <div class="figure__media">
+        <img
+          src="/images/wood-card.webp"
+          alt="Wood defect detection contact sheet: a plank with live-knot and dead-knot boxes, plus four validation crops"
+          width="1200"
+          height="900"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+      <figcaption>
+        Inference and validation views from the finished pipeline. The card is a composite of real predictions, not a mock-up.
+      </figcaption>
+    </figure>
+  </Fragment>
+
+  <CaseSection number="01" title="Wood is a natural material. Its defects are not neatly separable." id="problem">
+    <p class="case-lead">
+      A crack, a resin pocket, and a dead knot can occupy the same few pixels. The classes are visually close, the
+      dataset is long-tailed, and the cost of a miss is a bad plank that ships.
+    </p>
+    <p>
+      The task was to build an inspection pipeline, not just train a model: acquire the data, convert it to YOLO
+      format, split it without leakage, train and resume runs, validate with per-class metrics, run inference on
+      images, and finally run the detector on a live video stream.
+    </p>
+    <p>
+      The public dataset — Kaggle's <strong>Large-Scale Image Dataset of Wood Surface Defects</strong> — defines eight
+      classes: <strong>quartzity, live_knot, Marrow, resin, dead_knot, knot_with_crack, knot_missing, crack</strong>.
+      Some are self-explanatory. Some are not, and that ambiguity shows up in the results.
+    </p>
+    <div class="case-callout">
+      A detector is only useful if the evaluation survives contact with the class distribution. The case study keeps
+      the weak classes in the frame instead of reporting a single aggregate number.
+    </div>
+  </CaseSection>
+
+  <CaseSection number="02" title="One pipeline, from raw labels to a live stream." id="pipeline">
+    <p class="case-lead">
+      The repository is structured as a repeatable path. Each stage can run on its own, which matters when training is
+      interrupted and a run has to resume from a checkpoint.
+    </p>
+
+    <div class="case-pipeline" aria-label="Wood defect pipeline">
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">01</span>
+        <div>
+          <h3>Acquire</h3>
+          <p>Download the Kaggle dataset, unpack it, and preserve the original class folders and annotations.</p>
+          <span class="pipeline-step__meta">Kaggle API · Python</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">02</span>
+        <div>
+          <h3>Prepare</h3>
+          <p>Convert annotations into YOLO label files, inspect class frequencies, and create train / validation / test splits.</p>
+          <span class="pipeline-step__meta">YOLO format · stratified split</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">03</span>
+        <div>
+          <h3>Train &amp; resume</h3>
+          <p>Fine-tune a pretrained detector at 320&nbsp;px, checkpoint to Google Drive, and resume the run from the last checkpoint when Colab disconnects.</p>
+          <span class="pipeline-step__meta">Ultralytics YOLO · 200 epochs · AMP</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">04</span>
+        <div>
+          <h3>Validate</h3>
+          <p>Report precision, recall, mAP50, mAP50-95, per-class AP, and a normalized confusion matrix.</p>
+          <span class="pipeline-step__meta">best.pt · validation split</span>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="pipeline-step__index">05</span>
+        <div>
+          <h3>Infer</h3>
+          <p>Run batched image inference and a live path that resolves a YouTube stream with yt-dlp and decodes it with OpenCV.</p>
+          <span class="pipeline-step__meta">OpenCV · yt-dlp · annotated frames</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="case-code">
+      <div class="case-code__bar"><span>train.py / resume from checkpoint</span><span>Python</span></div>
+      <pre><code><span class="tok-com"># resume the same run instead of starting from scratch</span>
+<span class="tok-key">model</span> = YOLO(<span class="tok-str">"last.pt"</span>)
+model.train(
+    data=<span class="tok-str">"./dataset/data.yaml"</span>,
+    epochs=<span class="tok-str">200</span>,
+    imgsz=<span class="tok-str">320</span>,
+    project=<span class="tok-str">"wood_defects"</span>,
+    name=<span class="tok-str">"run_results"</span>,
+    resume=<span class="tok-key">True</span>,
+)
+
+<span class="tok-com"># live stream: yt-dlp resolves the URL, OpenCV decodes frames</span>
+<span class="tok-key">stream</span> = yt_dlp.YoutubeDL({<span class="tok-str">"format"</span>: <span class="tok-str">"best[ext=mp4]"</span>}).extract_info(url, download=<span class="tok-key">False</span>)
+cap = cv2.VideoCapture(stream[<span class="tok-str">"url"</span>])
+<span class="tok-key">while</span> cap.isOpened():
+    ok, frame = cap.read()
+    <span class="tok-key">if not</span> ok:
+        <span class="tok-key">break</span>
+    frame = model.predict(frame, conf=<span class="tok-str">0.4</span>)[<span class="tok-str">0</span>].plot()
+    cv2.imshow(<span class="tok-str">"wood_defects"</span>, frame)</code></pre>
+    </div>
+    <p class="case-note">
+      Simplified for readability. The repository keeps the run configuration, dataset paths, and stream handling in
+      separate cells so each stage can be rerun independently.
+    </p>
+  </CaseSection>
+
+  <CaseSection number="03" title="The best checkpoint is not the last checkpoint." id="results">
+    <p class="case-lead">
+      The run completed 200 epochs. The best validation score arrived at epoch 109 — and the final epoch was worse.
+      Reporting both is the difference between a benchmark and a useful checkpoint.
+    </p>
+
+    <div class="case-metrics">
+      <div class="case-metric">
+        <strong>0.626</strong>
+        <span>mAP50 at epoch 109 · best checkpoint</span>
+      </div>
+      <div class="case-metric">
+        <strong>0.324</strong>
+        <span>mAP50-95 at epoch 109</span>
+      </div>
+      <div class="case-metric">
+        <strong>8</strong>
+        <span>defect classes · 200 epochs · 320 px</span>
+      </div>
+    </div>
+
+    <p>
+      At the best checkpoint, precision was <strong>0.670</strong> and recall <strong>0.621</strong>. At the final epoch,
+      mAP50 fell to <strong>0.568</strong> and mAP50-95 to <strong>0.289</strong>. The pipeline therefore selects
+      <strong>best.pt</strong> for inference, and the checkpoint is treated as part of the artifact — not an
+      afterthought.
+    </p>
+
+    <div class="case-pair">
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/wood-pr-curve.webp" alt="Precision-recall curves for all eight wood defect classes, with an all-class mAP50 of 0.626" width="1400" height="933" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Precision-recall curves at the best checkpoint. Marrow is easy; quartzity and knot_with_crack are not.</figcaption>
+      </figure>
+      <figure class="case-figure case-figure--light">
+        <div class="figure__media">
+          <img src="/images/wood-confusion.webp" alt="Normalized confusion matrix for the eight wood defect classes" width="1400" height="1050" loading="lazy" decoding="async" />
+        </div>
+        <figcaption>Normalized confusion matrix. The off-diagonal mass is where visually similar defects collide.</figcaption>
+      </figure>
+    </div>
+
+    <figure class="case-figure case-figure--light">
+      <div class="figure__media">
+        <img src="/images/wood-val-pred.webp" alt="Validation batch predictions for wood surface defects, with boxes and confidence scores" width="1408" height="640" loading="lazy" decoding="async" />
+      </div>
+      <figcaption>Validation predictions from the best checkpoint. Low-confidence boxes are left in the frame so the failure modes stay visible.</figcaption>
+    </figure>
+  </CaseSection>
+
+  <CaseSection number="04" title="Where the detector is weak — and why." id="failures">
+    <p class="case-lead">
+      The aggregate mAP hides a two-tier problem. Four classes are usable, two are marginal, and two are effectively
+      research targets.
+    </p>
+
+    <table class="case-table">
+      <caption>Per-class AP at IoU 0.5 · best checkpoint</caption>
+      <thead>
+        <tr><th scope="col">Class</th><th scope="col">AP</th><th scope="col">Relative performance</th></tr>
+      </thead>
+      <tbody>
+        {classes.map(([name, ap]) => (
+          <tr>
+            <td>{name}</td>
+            <td>{ap.toFixed(3)}</td>
+            <td><div class="ap-track"><span style={`width: ${Math.round(ap * 100)}%`}></span></div></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <p>
+      <strong>Marrow</strong> reaches 0.927 AP, and <strong>dead_knot</strong> and <strong>live_knot</strong> are
+      respectable. <strong>Quartzity</strong> (0.308) and <strong>knot_with_crack</strong> (0.417) are the weak points.
+      The confusion matrix suggests why: quartzity is confused with background, and knot_with_crack shares visual
+      structure with both cracks and live knots.
+    </p>
+    <p>
+      Part of the cause is resolution. Training at <strong>320&nbsp;px</strong> is fast, but a hairline crack can be only a
+      few pixels wide after letterboxing. Part of it is label ambiguity: the boundary between a crack and a
+      knot_with_crack is not always obvious, even to a human annotator. A single aggregate metric would have hidden
+      both problems.
+    </p>
+
+    <div class="case-callout">
+      The useful question is not “what is the mAP?” It is “which class fails, on what kind of image, and what would it
+      cost to fix it?” The per-class table is the start of that conversation.
+    </div>
+  </CaseSection>
+
+  <CaseSection number="05" title="What I would change next." id="next">
+    <p class="case-lead">
+      The pipeline is a solid baseline, not a finished inspection product. The next iteration would attack resolution,
+      class balance, and deployment together.
+    </p>
+
+    <ul class="case-list">
+      <li><strong>Raise the input resolution.</strong> Train at 640&nbsp;px or use tiled inference for thin cracks, then measure the latency cost honestly.</li>
+      <li><strong>Rebalance the long tail.</strong> Targeted collection for quartzity and knot_with_crack, class-aware sampling, and harder copy-paste augmentation.</li>
+      <li><strong>Audit the labels.</strong> A second annotator on the confusable classes would tell us whether the model is wrong or the ground truth is.</li>
+      <li><strong>Evaluate on a fixed camera.</strong> The public dataset is a proxy. A production inspection cell has fixed lighting, distance, and motion blur — and those should be in the test set.</li>
+      <li><strong>Export and measure.</strong> ONNX or TensorRT, then report frames per second on the target hardware, not just on a Colab GPU.</li>
+    </ul>
+
+    <div class="case-links">
+      <a class="btn btn--primary" href="https://github.com/nomadka/wood_defects" target="_blank" rel="noreferrer">
+        Repository
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      <a class="btn btn--ghost" href="https://www.kaggle.com/datasets/nomihsa965/large-scale-image-dataset-of-wood-surface-defects" target="_blank" rel="noreferrer">Dataset</a>
+    </div>
+    <p class="case-note">
+      Dataset credit: “Large-Scale Image Dataset of Wood Surface Defects” on Kaggle. The model, training run, and
+      evaluation are my own.
+    </p>
+  </CaseSection>
+</CaseLayout>

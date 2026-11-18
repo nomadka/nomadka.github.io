@@ -1,0 +1,1099 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const focus = [
+  {
+    index: '01',
+    title: 'Perception under uncertainty',
+    body: 'Detectors, relevance logic, temporal validation, and the failure analysis that tells you which of them actually matters.',
+  },
+  {
+    index: '02',
+    title: 'Geometry & calibration',
+    body: 'Camera models, point clouds, coordinate conventions, and the transforms that make sensors agree with each other.',
+  },
+  {
+    index: '03',
+    title: 'Multimodal AI',
+    body: 'Turning perception into language an LLM planner can use — and evaluating whether the planner behaves better for it.',
+  },
+  {
+    index: '04',
+    title: 'Evaluation',
+    body: 'Closed-loop benchmarks, per-class metrics, ablations, and reports that keep the inconvenient numbers visible.',
+  },
+];
+
+const principles = [
+  {
+    index: '01',
+    title: 'Reproduce before you optimise.',
+    body: 'A result you cannot rerun is a rumour. Reproduce the baseline, understand the failure, then change one thing.',
+  },
+  {
+    index: '02',
+    title: 'Keep the failure in the frame.',
+    body: 'Aggregate metrics hide weak classes. The per-class table, the confusion matrix, and the bad validation batch are part of the result.',
+  },
+  {
+    index: '03',
+    title: 'Make the convention explicit.',
+    body: 'Most geometry bugs are unstated contracts between coordinate systems. Write the contract down, probe it, then transform.',
+  },
+  {
+    index: '04',
+    title: 'Measure on the target.',
+    body: 'A Colab GPU is not an inspection cell. Latency, lighting, and motion blur belong in the evaluation, not the appendix.',
+  },
+];
+
+const timeline = [
+  {
+    year: '2025',
+    date: 'Feb — Aug',
+    title: 'Master’s thesis · Institute for Intelligent Systems',
+    body: 'Built a traffic light and sign recognition architecture for LMDrive, evaluated in closed-loop CARLA simulation. Esslingen University of Applied Sciences.',
+  },
+  {
+    year: '2025',
+    date: 'Nov',
+    title: 'TLS-Assist on arXiv',
+    body: 'The thesis work became a paper with Fabian Schmidt, Markus Enzweiler, and Abhinav Valada. Code and models released.',
+  },
+  {
+    year: '2026',
+    date: 'IV',
+    title: 'IEEE Intelligent Vehicles Symposium',
+    body: 'TLS-Assist published at IEEE IV 2026, reporting up to +14% driving performance over LMDrive and +7% over BEVDriver.',
+  },
+  {
+    year: 'Now',
+    date: '—',
+    title: 'Building, measuring, looking for the next hard problem',
+    body: 'Interested in perception systems that connect sensing to reasoning: multimodal driving, sensor fusion, and world models.',
+  },
+];
+
+const stack: Array<[string, string[]]> = [
+  ['Perception', ['PyTorch', 'YOLO11', 'OpenCV', 'Open3D', 'NumPy']],
+  ['Autonomy', ['CARLA', 'LMDrive', 'BEVDriver', 'LangAuto', 'Sensor calibration']],
+  ['Multimodal AI', ['LangChain', 'Ollama', 'Chroma', 'Hugging Face', 'VLMs']],
+  ['Engineering', ['Python', 'C++', 'MATLAB', 'Git', 'Docker', 'Linux', 'LaTeX']],
+];
+---
+
+<BaseLayout
+  title="About"
+  description="About Noushiq Kayilan — a computer vision engineer in Germany working on perception for LLM-based autonomous driving, 3D geometry, and applied machine learning."
+>
+  <header class="about-hero">
+    <div class="container">
+      <div class="about-hero__top">
+        <p class="eyebrow">About / Operator profile</p>
+        <span class="mono muted">Noushiq Kayilan · DE</span>
+      </div>
+
+      <div class="about-hero__grid">
+        <div class="about-hero__copy">
+          <h1>Curious about the gap between a detection and a <em>decision.</em></h1>
+          <p class="about-hero__lead">
+            I’m Noushiq Kayilan, a computer vision engineer based in Germany. I work where perception meets language:
+            detectors, calibration, 3D geometry, and the layer that turns what a sensor sees into something a model can
+            act on.
+          </p>
+          <div class="about-hero__meta">
+            <span><b>Focus</b> Computer vision · multimodal perception</span>
+            <span><b>Based</b> Germany</span>
+            <span><b>Currently</b> Open to research &amp; applied AI collaborations</span>
+          </div>
+        </div>
+
+        <aside class="operator-card reveal" style="--delay: 120ms" aria-label="Profile summary">
+          <div class="operator-card__bar">
+            <span class="operator-card__live"><i></i> SUBJECT / NK-01</span>
+            <span>FOV 90°</span>
+          </div>
+          <div class="operator-card__viewport">
+            <span class="operator-card__corner operator-card__corner--tl"></span>
+            <span class="operator-card__corner operator-card__corner--tr"></span>
+            <span class="operator-card__corner operator-card__corner--bl"></span>
+            <span class="operator-card__corner operator-card__corner--br"></span>
+            <span class="operator-card__ring operator-card__ring--1" aria-hidden="true"></span>
+            <span class="operator-card__ring operator-card__ring--2" aria-hidden="true"></span>
+            <span class="operator-card__cross operator-card__cross--x" aria-hidden="true"></span>
+            <span class="operator-card__cross operator-card__cross--y" aria-hidden="true"></span>
+            <span class="operator-card__scan" aria-hidden="true"></span>
+            <div class="operator-card__id">
+              <span>NK</span>
+              <p>Computer vision<br />&amp; multimodal perception</p>
+            </div>
+            <span class="operator-card__axis operator-card__axis--x">X</span>
+            <span class="operator-card__axis operator-card__axis--y">Y</span>
+            <span class="operator-card__label operator-card__label--a">PERCEPTION</span>
+            <span class="operator-card__label operator-card__label--b">GEOMETRY</span>
+            <span class="operator-card__label operator-card__label--c">LANGUAGE</span>
+          </div>
+          <div class="operator-card__foot">
+            <div><span>BASED</span><strong>GERMANY</strong></div>
+            <div><span>DEGREE</span><strong>M.ENG.</strong></div>
+            <div><span>STATUS</span><strong class="green">OPEN</strong></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <section class="section section--line bio" aria-labelledby="bio-title">
+    <div class="container bio__grid">
+      <div class="bio__label">
+        <p class="eyebrow" id="bio-title">01 / Background</p>
+        <p class="bio__side">A short version, with the details that can be verified.</p>
+      </div>
+      <div class="bio__body">
+        <p class="bio__lead">
+          My work sits between classical computer vision and multimodal AI. I like problems where the data is messy,
+          the geometry is under-specified, and the metric has to survive contact with a real system.
+        </p>
+        <p>
+          I studied Automotive Systems at Esslingen University of Applied Sciences. For my master’s thesis, from
+          February to August 2025, I worked at the Institute for Intelligent Systems on a perception problem in
+          LLM-based autonomous driving: the planner could reason about a route, but it could not reliably see a
+          traffic light or a sign.
+        </p>
+        <p>
+          The result was a modular traffic light and sign recognition architecture for LMDrive, evaluated in
+          closed-loop CARLA simulation. It detects the relevant signal, validates its state over time, and converts it
+          into natural language for the planner. That work became <strong>TLS-Assist</strong>, published at
+          <strong>IEEE IV 2026</strong> with Fabian Schmidt, Markus Enzweiler, and Abhinav Valada. The code and models
+          are public.
+        </p>
+        <p>
+          Alongside that research, I’ve built an end-to-end wood-defect inspection pipeline, reverse-engineered the
+          coordinate system of a custom point-cloud viewer, written a reusable camera-calibration toolkit, and built a
+          local retrieval assistant that runs on-device. Different problems, same instinct: make the system legible,
+          measure it honestly, and leave the failure modes where people can see them.
+        </p>
+        <p>
+          I’m interested in the next layer of perception — vision-language models, sensor fusion, and world models — and
+          in the engineering discipline that keeps them honest. If you’re working on something in that space, I’d like
+          to hear about it.
+        </p>
+        <div class="bio__actions">
+          <a class="btn btn--primary" href="mailto:noushikayilan@gmail.com">
+            Get in touch
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+          <a class="btn btn--ghost" href="/work/">See the work</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="focus" aria-labelledby="focus-title">
+    <div class="container">
+      <div class="focus__head">
+        <p class="eyebrow">02 / Focus</p>
+        <h2 id="focus-title">Four things I keep coming <em>back to.</em></h2>
+      </div>
+      <div class="focus__grid">
+        {focus.map((item, i) => (
+          <article class="focus__item reveal" style={`--delay: ${i * 60}ms`}>
+            <div class="focus__item-head">
+              <span class="mono accent">{item.index}</span>
+              <span class="focus__rule" aria-hidden="true"></span>
+            </div>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--line principles" aria-labelledby="principles-title">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <p class="eyebrow reveal">03 / How I work</p>
+          <h2 class="section-title reveal" id="principles-title" style="--delay: 60ms">
+            The habits behind the <em>artifacts.</em>
+          </h2>
+        </div>
+        <p class="section-note reveal" style="--delay: 120ms">
+          Not a manifesto. Just the things I find myself doing on every project that works.
+        </p>
+      </div>
+
+      <div class="principle-list">
+        {principles.map((item, i) => (
+          <article class="principle reveal" style={`--delay: ${i * 60}ms`}>
+            <span class="principle__index">{item.index}</span>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="timeline-section" aria-labelledby="timeline-title">
+    <div class="container timeline-grid">
+      <div class="timeline-intro">
+        <p class="eyebrow">04 / Timeline</p>
+        <h2 id="timeline-title">The visible <em>trail.</em></h2>
+        <p>
+          A short record of the work that can be pointed to publicly. The full CV includes earlier experience and
+          references.
+        </p>
+      </div>
+
+      <ol class="timeline">
+        {timeline.map((item, i) => (
+          <li class="timeline__row reveal" style={`--delay: ${i * 60}ms`}>
+            <div class="timeline__when">
+              <span class="timeline__year">{item.year}</span>
+              <span class="timeline__date">{item.date}</span>
+            </div>
+            <div class="timeline__body">
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--line toolkit" aria-labelledby="toolkit-title">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <p class="eyebrow reveal">05 / Toolkit</p>
+          <h2 class="section-title reveal" id="toolkit-title" style="--delay: 60ms">
+            Tools are the easy part. <em>Judgement</em> is the work.
+          </h2>
+        </div>
+        <p class="section-note reveal" style="--delay: 120ms">
+          The stack I reach for most often. I pick tools for the failure mode, not the logo.
+        </p>
+      </div>
+
+      <div class="toolkit__grid">
+        {stack.map(([group, items], i) => (
+          <div class="toolkit__group reveal" style={`--delay: ${i * 60}ms`}>
+            <h3>{group}</h3>
+            <ul class="tag-list">
+              {items.map((tool) => <li class="tag">{tool}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div class="now-panel">
+        <div class="now-panel__head">
+          <span class="mono accent">Currently exploring</span>
+          <span class="mono muted">Not yet on a case study</span>
+        </div>
+        <p>
+          Vision-language models for driving, sensor fusion beyond a single camera, and world models as a place to test
+          perception before the road does. I’m also interested in the evaluation problem those systems create: what does
+          a good driving score mean when the model can explain itself?
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cv-band" aria-labelledby="cv-title">
+    <div class="container cv-band__grid">
+      <div>
+        <p class="eyebrow">06 / CV</p>
+        <h2 id="cv-title">The full record, on <em>request.</em></h2>
+        <p>
+          A PDF CV with the complete timeline, earlier experience, education, and references is available by email.
+          I’m happy to send it with a short note about what you’re working on.
+        </p>
+      </div>
+      <div class="cv-band__actions">
+        <a class="btn btn--primary" href="mailto:noushikayilan@gmail.com?subject=CV%20request">
+          Request CV
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="btn btn--ghost" href="https://www.linkedin.com/in/noushiq" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-cta">
+    <div class="container about-cta__inner">
+      <div>
+        <p class="eyebrow reveal">Next</p>
+        <h2 class="reveal" style="--delay: 60ms">Bring me a problem that needs <em>seeing.</em></h2>
+      </div>
+      <div class="about-cta__actions reveal" style="--delay: 120ms">
+        <a class="btn btn--primary" href="mailto:noushikayilan@gmail.com">
+          noushikayilan@gmail.com
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="btn btn--ghost" href="https://github.com/nomadka" target="_blank" rel="noreferrer">GitHub ↗</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-hero {
+    padding-top: clamp(126px, 15vw, 176px);
+    padding-bottom: clamp(48px, 6vw, 76px);
+  }
+
+  .about-hero__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+
+  .about-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+    margin-top: clamp(32px, 4vw, 48px);
+  }
+
+  .about-hero h1 {
+    max-width: 12ch;
+    font-family: var(--font-serif);
+    font-size: clamp(3.3rem, 7.2vw, 7rem);
+    line-height: 0.91;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .about-hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .about-hero__lead {
+    max-width: 58ch;
+    margin-top: 26px;
+    font-size: clamp(1rem, 1.4vw, 1.14rem);
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .about-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .about-hero__meta b {
+    margin-right: 5px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  /* Operator card */
+  .operator-card {
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: rgba(11, 15, 20, 0.92);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+  }
+
+  .operator-card__bar,
+  .operator-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 14px;
+    background: rgba(7, 9, 12, 0.7);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .operator-card__bar {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .operator-card__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text);
+  }
+
+  .operator-card__live i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 9px rgba(113, 245, 168, 0.8);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  .operator-card__viewport {
+    position: relative;
+    aspect-ratio: 5 / 4;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 47%, rgba(255, 181, 71, 0.09), transparent 38%),
+      linear-gradient(180deg, #0b1015, #080b0f);
+  }
+
+  .operator-card__viewport::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(244, 241, 234, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244, 241, 234, 0.04) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 20%, transparent 78%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 20%, transparent 78%);
+  }
+
+  .operator-card__corner {
+    position: absolute;
+    z-index: 2;
+    width: 22px;
+    height: 22px;
+    border-color: rgba(244, 241, 234, 0.5);
+    border-style: solid;
+  }
+
+  .operator-card__corner--tl { top: 14px; left: 14px; border-width: 1px 0 0 1px; }
+  .operator-card__corner--tr { top: 14px; right: 14px; border-width: 1px 1px 0 0; }
+  .operator-card__corner--bl { bottom: 14px; left: 14px; border-width: 0 0 1px 1px; }
+  .operator-card__corner--br { bottom: 14px; right: 14px; border-width: 0 1px 1px 0; }
+
+  .operator-card__ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border: 1px solid rgba(255, 181, 71, 0.28);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .operator-card__ring--1 { width: 58%; aspect-ratio: 1; }
+  .operator-card__ring--2 { width: 82%; aspect-ratio: 1; border-color: rgba(244, 241, 234, 0.1); }
+
+  .operator-card__cross {
+    position: absolute;
+    background: rgba(244, 241, 234, 0.1);
+  }
+
+  .operator-card__cross--x { top: 50%; left: 8%; right: 8%; height: 1px; }
+  .operator-card__cross--y { left: 50%; top: 8%; bottom: 8%; width: 1px; }
+
+  .operator-card__scan {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    top: -30%;
+    height: 30%;
+    background: linear-gradient(180deg, transparent, rgba(113, 245, 168, 0.08), transparent);
+    mix-blend-mode: screen;
+    animation: scan 7s linear infinite;
+    pointer-events: none;
+  }
+
+  .operator-card__id {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .operator-card__id > span {
+    font-family: var(--font-serif);
+    font-size: clamp(5rem, 9vw, 7rem);
+    line-height: 0.8;
+    letter-spacing: -0.04em;
+    color: var(--text);
+  }
+
+  .operator-card__id p {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    line-height: 1.7;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .operator-card__axis {
+    position: absolute;
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: var(--muted-2);
+  }
+
+  .operator-card__axis--x { right: 18px; top: calc(50% + 6px); }
+  .operator-card__axis--y { top: 18px; left: calc(50% + 6px); }
+
+  .operator-card__label {
+    position: absolute;
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-size: 7px;
+    letter-spacing: 0.14em;
+    color: var(--muted-2);
+  }
+
+  .operator-card__label--a { bottom: 16%; left: 9%; color: var(--green); }
+  .operator-card__label--b { top: 20%; right: 9%; }
+  .operator-card__label--c { bottom: 16%; right: 9%; color: var(--amber); }
+
+  .operator-card__foot {
+    border-top: 1px solid var(--line);
+    padding-block: 12px;
+  }
+
+  .operator-card__foot div {
+    display: grid;
+    gap: 3px;
+  }
+
+  .operator-card__foot div + div {
+    padding-left: 14px;
+    border-left: 1px solid var(--line);
+  }
+
+  .operator-card__foot span {
+    font-size: 7px;
+    color: var(--muted-2);
+  }
+
+  .operator-card__foot strong {
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes scan {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(430%); }
+  }
+
+  /* Bio */
+  .bio {
+    padding-top: clamp(56px, 7vw, 92px);
+  }
+
+  .bio__grid {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: clamp(24px, 5vw, 70px);
+    align-items: start;
+  }
+
+  .bio__label {
+    position: sticky;
+    top: 110px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .bio__side {
+    max-width: 20ch;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    line-height: 1.7;
+    color: var(--muted-2);
+  }
+
+  .bio__body {
+    max-width: 70ch;
+  }
+
+  .bio__body p {
+    margin-top: 16px;
+    font-size: 15.5px;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .bio__body p:first-child {
+    margin-top: 0;
+  }
+
+  .bio__lead {
+    font-size: clamp(1.2rem, 1.9vw, 1.5rem) !important;
+    line-height: 1.55 !important;
+    color: var(--text) !important;
+  }
+
+  .bio__body strong {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .bio__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  /* Focus */
+  .focus {
+    padding-block: clamp(64px, 8vw, 104px);
+    border-block: 1px solid var(--line);
+    background: rgba(10, 14, 18, 0.5);
+  }
+
+  .focus__head h2 {
+    max-width: 18ch;
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.6rem, 5vw, 4.8rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+  }
+
+  .focus__head h2 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .focus__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: clamp(28px, 4vw, 44px);
+  }
+
+  .focus__item {
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .focus__item-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .focus__rule {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .focus__item h3 {
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    line-height: 1.05;
+  }
+
+  .focus__item p {
+    margin-top: 10px;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  /* Principles */
+  .section-note {
+    max-width: 36ch;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .principle-list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .principle {
+    display: grid;
+    grid-template-columns: 70px 280px minmax(0, 1fr);
+    gap: 24px;
+    align-items: baseline;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .principle__index {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+  }
+
+  .principle h3 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    line-height: 1.1;
+  }
+
+  .principle p {
+    max-width: 58ch;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  /* Timeline */
+  .timeline-section {
+    padding-block: clamp(64px, 8vw, 104px);
+    border-top: 1px solid var(--line);
+  }
+
+  .timeline-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
+    gap: clamp(30px, 6vw, 80px);
+    align-items: start;
+  }
+
+  .timeline-intro h2 {
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 4.4vw, 4.2rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+  }
+
+  .timeline-intro h2 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .timeline-intro > p:last-child {
+    max-width: 36ch;
+    margin-top: 18px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .timeline__row {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 22px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .timeline__when {
+    display: grid;
+    gap: 4px;
+    align-content: start;
+  }
+
+  .timeline__year {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--amber);
+  }
+
+  .timeline__date {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .timeline__body h3 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.35rem, 2.2vw, 1.8rem);
+    line-height: 1.12;
+  }
+
+  .timeline__body p {
+    margin-top: 7px;
+    max-width: 62ch;
+    font-size: 13px;
+    line-height: 1.62;
+    color: var(--muted);
+  }
+
+  /* Toolkit */
+  .toolkit__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .toolkit__group {
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  .toolkit__group h3 {
+    margin-bottom: 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .now-panel {
+    margin-top: clamp(34px, 5vw, 52px);
+    padding: clamp(20px, 3vw, 30px);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(180deg, rgba(113, 245, 168, 0.04), rgba(255, 255, 255, 0.012));
+  }
+
+  .now-panel__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .now-panel__head .mono:last-child {
+    font-size: 8px;
+    color: var(--muted-2);
+    text-align: right;
+  }
+
+  .now-panel p {
+    max-width: 82ch;
+    margin-top: 16px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  /* CV */
+  .cv-band {
+    padding-block: clamp(56px, 7vw, 92px);
+    border-block: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--paper-ink);
+  }
+
+  .cv-band .eyebrow {
+    color: #5c645d;
+  }
+
+  .cv-band .eyebrow::before {
+    background: #8e968e;
+  }
+
+  .cv-band__grid {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .cv-band h2 {
+    max-width: 16ch;
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.6rem, 5vw, 4.8rem);
+    line-height: 0.96;
+    letter-spacing: -0.025em;
+  }
+
+  .cv-band h2 em {
+    font-style: italic;
+    color: #8a5a00;
+  }
+
+  .cv-band p:not(.eyebrow) {
+    max-width: 58ch;
+    margin-top: 18px;
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: #3f4841;
+  }
+
+  .cv-band__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex: none;
+  }
+
+  .cv-band .btn--ghost {
+    --btn-fg: var(--paper-ink);
+    --btn-border: rgba(16, 20, 24, 0.24);
+  }
+
+  .cv-band .btn--ghost:hover {
+    --btn-border: #8a5a00;
+    color: #8a5a00;
+  }
+
+  /* CTA */
+  .about-cta {
+    padding-block: clamp(64px, 9vw, 110px);
+  }
+
+  .about-cta__inner {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .about-cta h2 {
+    max-width: 18ch;
+    margin-top: 18px;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 5vw, 4.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+  }
+
+  .about-cta h2 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+
+  .about-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 1060px) {
+    .about-hero__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .operator-card {
+      max-width: 560px;
+    }
+
+    .focus__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .toolkit__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .principle {
+      grid-template-columns: 50px 220px minmax(0, 1fr);
+    }
+
+    .cv-band__grid {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .bio__grid,
+    .timeline-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .bio__label {
+      position: static;
+    }
+
+    .principle {
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 10px 18px;
+    }
+
+    .principle p {
+      grid-column: 2;
+    }
+
+    .about-cta__inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .about-hero__top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .about-hero h1 {
+      max-width: 100%;
+    }
+
+    .focus__grid,
+    .toolkit__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .operator-card__id > span {
+      font-size: 4.4rem;
+    }
+
+    .operator-card__label--a,
+    .operator-card__label--c {
+      bottom: 12%;
+    }
+
+    .timeline__row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .now-panel__head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .now-panel__head .mono:last-child {
+      text-align: left;
+    }
+  }
+</style>
