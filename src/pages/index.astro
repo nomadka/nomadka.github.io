@@ -3,12 +3,109 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 
 const proof = [
-  ['IEEE IV 2026', 'peer-reviewed'],
-  ['arXiv 2511.14391', 'preprint'],
+  ['IEEE IV 2026', 'co-authored'],
   ['+14%', 'vs LMDrive'],
   ['+7%', 'vs BEVDriver'],
+  ['Data Validation', '2M Frames'],
   ['CARLA', 'closed-loop'],
-  ['YOLO11 · PyTorch · Open3D', 'stack'],
+  ['OpenCV · YOLO · PyTorch · Open3D · Pandas', 'stack'],
+];
+
+type HeroSlide = {
+  label: string;
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+  caption: string;
+  href: string;
+  link: string;
+  foot: Array<{ label: string; value: string; tone?: 'amber' | 'green' }>;
+  detection?: { x: string; y: string; w: string; h: string; label: string };
+};
+
+const slides: HeroSlide[] = [
+  {
+    label: 'TLS-ASSIST / LANG AUTO',
+    src: '/images/hero-carla.webp',
+    width: 1200,
+    height: 900,
+    alt: 'CARLA closed-loop driving scene with three camera views, a yellow traffic light, and natural-language driving notices',
+    caption:
+      'TLS-Assist — traffic-light and sign perception that turns camera evidence into natural-language notices for an LLM driving agent.',
+    href: '/work/tls-assist/',
+    link: 'TLS-Assist case study',
+    foot: [
+      { label: 'VIEWS', value: '03' },
+      { label: 'SIGNAL', value: 'YELLOW', tone: 'amber' },
+      { label: 'NOTICE', value: 'INJECTED' },
+    ],
+    detection: { x: '62%', y: '38%', w: '14%', h: '23%', label: 'traffic_light · yellow' },
+  },
+  {
+    label: 'ADMIT14 / EKF TRACK',
+    src: '/images/admit14-tracking.webp',
+    width: 1136,
+    height: 754,
+    alt: 'Overhead camera view of a 1:14-scale car tracked around a test track, with a detection box and a blue EKF trajectory',
+    caption:
+      'ADMIT14 — a 4K overhead camera calibrated to the track; detections are projected to the floor and fused by an EKF into a continuous vehicle state.',
+    href: '/work/admit14/',
+    link: 'ADMIT14 case study',
+    foot: [
+      { label: 'SENSOR', value: '4K' },
+      { label: 'FILTER', value: 'EKF' },
+      { label: 'STATE', value: 'x, y, θ' },
+    ],
+  },
+  {
+    label: 'WOOD / DEFECT SCAN',
+    src: '/images/hero-wood.webp',
+    width: 1200,
+    height: 900,
+    alt: 'Close-up of a wood plank with YOLO26 detections marking live and dead knots',
+    caption:
+      'Wood surface defects — a YOLO26 nano detector trained at 320 px, with accuracy and compute budget reported side by side.',
+    href: '/work/wood-defects/',
+    link: 'Wood defects case study',
+    foot: [
+      { label: 'MODEL', value: 'YOLO26n' },
+      { label: 'mAP50', value: '0.626', tone: 'green' },
+      { label: 'BUDGET', value: '5.9 GFLOPs' },
+    ],
+  },
+  {
+    label: 'POINT CLOUD / ALIGNED',
+    src: '/images/hero-pointclouds.webp',
+    width: 1200,
+    height: 900,
+    alt: 'Aligned point-cloud reconstruction of an indoor scene with a hallway, furniture, and a workspace',
+    caption:
+      "Point-cloud alignment — three scans brought into a viewer's undocumented frame, reflections included, with an identity trajectory instead of stacked transforms.",
+    href: '/work/point-clouds/',
+    link: 'Point clouds case study',
+    foot: [
+      { label: 'SETS', value: '03' },
+      { label: 'FRAME', value: 'Y-DOWN' },
+      { label: 'METHOD', value: 'Open3D' },
+    ],
+  },
+  {
+    label: 'CALIBRATION / INTRINSICS',
+    src: '/images/hero-calibration.webp',
+    width: 1200,
+    height: 900,
+    alt: 'Checkerboard calibration target with sub-pixel corner detection and row lines overlaid',
+    caption:
+      'Camera calibration — intrinsics and distortion recovered from a chessboard, then checked against 26 synthetic views with known ground truth.',
+    href: '/work/camera-calibration/',
+    link: 'Calibration case study',
+    foot: [
+      { label: 'TARGET', value: '9×6' },
+      { label: 'VIEWS', value: '26' },
+      { label: 'CHECK', value: 'REPROJECTION' },
+    ],
+  },
 ];
 ---
 
@@ -16,12 +113,12 @@ const proof = [
   <section class="hero">
     <div class="container hero__grid">
       <div class="hero__copy">
-        <p class="eyebrow eyebrow--dot reveal">Perception · Autonomous driving · Germany</p>
+        <p class="eyebrow eyebrow--dot reveal">Perception · Autonomous Systems · Germany</p>
         <h1 class="reveal" style="--delay: 70ms">
-          Making the road <em>legible</em> to machines.
+          Making the physical <em>legible</em> to machines.
         </h1>
         <p class="hero__sub reveal" style="--delay: 140ms">
-          I'm Noushiq Kayilan, a computer vision engineer building perception systems for LLM-driven autonomous driving. My work turns traffic lights, signs, and sensor geometry into signals a driving model can act on.
+          I'm Noushiq Mohammed Kayilan Abdul Nazar, a computer vision engineer building perception systems for autonomous driving and robotics. My work turns real-world observations into signals that power intelligent decision-making.
         </p>
         <div class="hero__actions reveal" style="--delay: 210ms">
           <a class="btn btn--primary" href="#work">
@@ -38,42 +135,94 @@ const proof = [
           </a>
         </div>
         <div class="hero__meta reveal" style="--delay: 280ms">
-          <span><b>IEEE IV 2026</b> · TLS-Assist</span>
+          <span><b>IEEE IV 2026</b> · co-authored</span>
           <span><b>M.Eng.</b> Automotive Systems</span>
         </div>
       </div>
 
       <div class="hero__visual reveal" style="--delay: 180ms">
-        <div class="vision-frame">
+        <div
+          class="vision-frame"
+          data-slideshow
+          data-playing="false"
+          data-slides={JSON.stringify(slides)}
+          role="group"
+          aria-roledescription="carousel"
+          aria-label="Selected project imagery across TLS-Assist, ADMIT14, wood defects, point clouds, and camera calibration"
+        >
           <div class="vision-frame__bar">
-            <span class="vision-frame__live"><i></i> CARLA / LANG AUTO</span>
-            <span>FRAME 0042</span>
+            <span class="vision-frame__live"><i></i> <span data-slide-label>{slides[0].label}</span></span>
+            <div class="vision-frame__controls">
+              <button type="button" data-slide-prev aria-label="Previous project image">
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M7.5 2.5 4 6l3.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <span class="vision-frame__count" data-slide-count aria-hidden="true">
+                {`01 / ${String(slides.length).padStart(2, '0')}`}
+              </span>
+              <button type="button" data-slide-next aria-label="Next project image">
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <button type="button" class="vision-frame__toggle" data-slide-toggle aria-label="Play slideshow">
+                <svg class="icon-pause" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <rect x="3" y="2.5" width="2" height="7" rx="0.5" fill="currentColor" />
+                  <rect x="7" y="2.5" width="2" height="7" rx="0.5" fill="currentColor" />
+                </svg>
+                <svg class="icon-play" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M4 2.8v6.4L9.2 6 4 2.8Z" fill="currentColor" />
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="vision-frame__media">
             <img
-              src="/images/hero-carla.webp"
-              alt="CARLA closed-loop driving scene with three camera views, a yellow traffic light, and natural-language driving notices"
-              width="1200"
-              height="900"
+              src={slides[0].src}
+              alt={slides[0].alt}
+              width={slides[0].width}
+              height={slides[0].height}
               fetchpriority="high"
               decoding="async"
+              data-slide-image
             />
             <div class="vision-frame__scan" aria-hidden="true"></div>
-            <div class="detection" style="--x: 62%; --y: 38%; --w: 14%; --h: 23%;">
-              <span class="detection__label">traffic_light · yellow</span>
-            </div>
+            {slides[0].detection && (
+              <div
+                class="detection"
+                data-slide-detection
+                style={`--x: ${slides[0].detection.x}; --y: ${slides[0].detection.y}; --w: ${slides[0].detection.w}; --h: ${slides[0].detection.h};`}
+              >
+                <span class="detection__label" data-slide-detection-label>{slides[0].detection.label}</span>
+              </div>
+            )}
             <div class="vision-frame__reticle" aria-hidden="true">
               <span></span><span></span><span></span><span></span>
             </div>
           </div>
           <div class="vision-frame__foot">
-            <div><span>VIEWS</span><strong>03</strong></div>
-            <div><span>SIGNAL</span><strong class="green">YELLOW</strong></div>
-            <div><span>NOTICE</span><strong>INJECTED</strong></div>
+            {slides[0].foot.map((item) => (
+              <div>
+                <span data-slide-foot-label>{item.label}</span>
+                <strong
+                  data-slide-foot
+                  class={item.tone === 'amber' ? 'is-amber' : item.tone === 'green' ? 'is-green' : undefined}
+                >
+                  {item.value}
+                </strong>
+              </div>
+            ))}
           </div>
         </div>
         <p class="hero__caption">
-          Closed-loop evaluation in CARLA. Traffic-light notices are generated by the perception layer and injected into the driving agent's prompt.
+          <span data-slide-caption>{slides[0].caption}</span>
+          <a class="hero__caption-link" href={slides[0].href} data-slide-link>
+            <span data-slide-link-label>{slides[0].link}</span>
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
         </p>
       </div>
     </div>
@@ -577,7 +726,14 @@ const proof = [
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    min-width: 0;
     color: var(--text);
+  }
+
+  .vision-frame__live > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .vision-frame__live i {
@@ -587,6 +743,61 @@ const proof = [
     background: var(--green);
     box-shadow: 0 0 10px rgba(113, 245, 168, 0.8);
     animation: pulse 2.2s ease-in-out infinite;
+    flex: none;
+  }
+
+  .vision-frame__controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: -6px;
+    flex: none;
+  }
+
+  .vision-frame__controls button {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.2s var(--ease);
+  }
+
+  .vision-frame__controls button:hover {
+    color: var(--amber);
+  }
+
+  .vision-frame__controls button:focus-visible {
+    outline: 1px solid var(--amber);
+    outline-offset: -3px;
+  }
+
+  .vision-frame__controls svg {
+    display: block;
+  }
+
+  .vision-frame__count {
+    min-width: 52px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
+  .vision-frame[data-playing="false"] .vision-frame__toggle .icon-pause {
+    display: none;
+  }
+
+  .vision-frame[data-playing="false"] .vision-frame__toggle .icon-play {
+    display: block;
+  }
+
+  .vision-frame__toggle .icon-play {
+    display: none;
   }
 
   .vision-frame__media {
@@ -600,6 +811,11 @@ const proof = [
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.2s ease;
+  }
+
+  .vision-frame__media > img.is-out {
+    opacity: 0;
   }
 
   .vision-frame__media::after {
@@ -724,6 +940,14 @@ const proof = [
     color: var(--text);
   }
 
+  .vision-frame__foot strong.is-amber {
+    color: var(--amber);
+  }
+
+  .vision-frame__foot strong.is-green {
+    color: var(--green);
+  }
+
   .hero__caption {
     max-width: 48ch;
     margin-top: 13px;
@@ -731,6 +955,30 @@ const proof = [
     font-size: 9px;
     line-height: 1.7;
     color: var(--muted-2);
+  }
+
+  .hero__caption-link {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 5px;
+    margin-top: 7px;
+    color: var(--amber);
+    font-size: 8.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s var(--ease);
+  }
+
+  .hero__caption-link:hover {
+    border-color: currentColor;
+  }
+
+  .hero__caption-link:focus-visible {
+    outline: 1px solid var(--amber);
+    outline-offset: 3px;
   }
 
   @keyframes pulse {
@@ -1522,3 +1770,159 @@ const proof = [
     }
   }
 </style>
+
+<script>
+  type HeroSlide = {
+    label: string;
+    src: string;
+    width: number;
+    height: number;
+    alt: string;
+    caption: string;
+    href: string;
+    link: string;
+    foot: Array<{ label: string; value: string; tone?: 'amber' | 'green' }>;
+    detection?: { x: string; y: string; w: string; h: string; label: string };
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-slideshow]');
+  const slides: HeroSlide[] = root?.dataset.slides ? JSON.parse(root.dataset.slides) : [];
+
+  if (root && slides.length > 1) {
+    const image = root.querySelector<HTMLImageElement>('[data-slide-image]');
+    const slideLabel = root.querySelector<HTMLElement>('[data-slide-label]');
+    const count = root.querySelector<HTMLElement>('[data-slide-count]');
+    const caption = document.querySelector<HTMLElement>('[data-slide-caption]');
+    const link = document.querySelector<HTMLAnchorElement>('[data-slide-link]');
+    const linkLabel = document.querySelector<HTMLElement>('[data-slide-link-label]');
+    const footLabels = root.querySelectorAll<HTMLElement>('[data-slide-foot-label]');
+    const footValues = root.querySelectorAll<HTMLElement>('[data-slide-foot]');
+    const detection = root.querySelector<HTMLElement>('[data-slide-detection]');
+    const detectionLabel = root.querySelector<HTMLElement>('[data-slide-detection-label]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-slide-toggle]');
+    const previous = root.querySelector<HTMLButtonElement>('[data-slide-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-slide-next]');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const interval = 6500;
+    let index = 0;
+    let playing = false;
+    let timer: number | undefined;
+    let swapping = false;
+
+    const pad = (value: number) => String(value).padStart(2, '0');
+
+    const render = (slide: HeroSlide) => {
+      if (!image) return;
+      image.src = slide.src;
+      image.alt = slide.alt;
+      image.width = slide.width;
+      image.height = slide.height;
+      if (slideLabel) slideLabel.textContent = slide.label;
+      if (count) count.textContent = `${pad(index + 1)} / ${pad(slides.length)}`;
+      if (caption) caption.textContent = slide.caption;
+      if (link) link.href = slide.href;
+      if (linkLabel) linkLabel.textContent = slide.link;
+      footLabels.forEach((element, position) => {
+        const item = slide.foot[position];
+        if (item) element.textContent = item.label;
+      });
+      footValues.forEach((element, position) => {
+        const item = slide.foot[position];
+        if (!item) return;
+        element.textContent = item.value;
+        element.classList.toggle('is-amber', item.tone === 'amber');
+        element.classList.toggle('is-green', item.tone === 'green');
+      });
+      if (detection && detectionLabel) {
+        if (slide.detection) {
+          detection.hidden = false;
+          detection.style.setProperty('--x', slide.detection.x);
+          detection.style.setProperty('--y', slide.detection.y);
+          detection.style.setProperty('--w', slide.detection.w);
+          detection.style.setProperty('--h', slide.detection.h);
+          detectionLabel.textContent = slide.detection.label;
+        } else {
+          detection.hidden = true;
+        }
+      }
+    };
+
+    const show = async (target: number, instant = false) => {
+      if (swapping || !image) return;
+      const nextIndex = (target + slides.length) % slides.length;
+      if (nextIndex === index && !instant) return;
+      const slide = slides[nextIndex];
+      index = nextIndex;
+      if (instant || reduceMotion.matches) {
+        render(slide);
+        return;
+      }
+      swapping = true;
+      image.classList.add('is-out');
+      await new Promise((resolve) => window.setTimeout(resolve, 180));
+      render(slide);
+      try {
+        await image.decode();
+      } catch {
+        /* decode can reject on cached or unsupported sources; the new frame still paints */
+      }
+      image.classList.remove('is-out');
+      swapping = false;
+    };
+
+    const stop = () => {
+      if (timer !== undefined) {
+        window.clearInterval(timer);
+        timer = undefined;
+      }
+    };
+
+    const start = () => {
+      stop();
+      if (!playing) return;
+      timer = window.setInterval(() => {
+        void show(index + 1);
+      }, interval);
+    };
+
+    const setPlaying = (value: boolean) => {
+      playing = value;
+      root.dataset.playing = String(value);
+      toggle?.setAttribute('aria-label', value ? 'Pause slideshow' : 'Play slideshow');
+      start();
+    };
+
+    previous?.addEventListener('click', () => {
+      void show(index - 1);
+      start();
+    });
+
+    next?.addEventListener('click', () => {
+      void show(index + 1);
+      start();
+    });
+
+    toggle?.addEventListener('click', () => setPlaying(!playing));
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else start();
+    });
+
+    reduceMotion.addEventListener('change', (event) => {
+      if (event.matches) setPlaying(false);
+    });
+
+    const preload = () => {
+      slides.slice(1).forEach((slide) => {
+        const preloadImage = new Image();
+        preloadImage.src = slide.src;
+      });
+    };
+
+    if (document.readyState === 'complete') preload();
+    else window.addEventListener('load', preload, { once: true });
+
+    setPlaying(!reduceMotion.matches);
+  }
+</script>
