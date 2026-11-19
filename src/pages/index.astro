@@ -2,10 +2,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 
-const proof = [
+const proof: Array<[string, string, boolean?]> = [
   ['IEEE IV 2026', 'co-authored'],
-  ['+14%', 'vs LMDrive'],
-  ['+7%', 'vs BEVDriver'],
+  ['+14%', 'vs LMDrive', true],
+  ['+7%', 'vs BEVDriver', true],
   ['Data Validation', '2M Frames'],
   ['CARLA', 'closed-loop'],
   ['OpenCV · YOLO · PyTorch · Open3D · Pandas', 'stack'],
@@ -231,13 +231,13 @@ const slides: HeroSlide[] = [
   <div class="proof" aria-label="Selected proof points">
     <div class="proof__track">
       <div class="proof__group">
-        {proof.map(([strong, rest]) => (
-          <span class="proof__item"><b>{strong}</b> {rest}</span>
+        {proof.map(([strong, rest, accent]) => (
+          <span class:list={['proof__item', { 'proof__item--accent': accent }]}><b>{strong}</b> {rest}</span>
         ))}
       </div>
       <div class="proof__group" aria-hidden="true">
-        {proof.map(([strong, rest]) => (
-          <span class="proof__item"><b>{strong}</b> {rest}</span>
+        {proof.map(([strong, rest, accent]) => (
+          <span class:list={['proof__item', { 'proof__item--accent': accent }]}><b>{strong}</b> {rest}</span>
         ))}
       </div>
     </div>
@@ -525,7 +525,7 @@ const slides: HeroSlide[] = [
           <span class="timeline__year">2026</span>
           <div>
             <h3>IEEE IV 2026 · TLS-Assist</h3>
-            <p>Peer-reviewed publication; code and fine-tuned models released for LMDrive and BEVDriver.</p>
+            <p>Co-authored publication; code and fine-tuned models released for LMDrive and BEVDriver.</p>
           </div>
         </div>
         <div class="timeline__row reveal" style="--delay: 70ms">
@@ -1032,8 +1032,7 @@ const slides: HeroSlide[] = [
     color: var(--text);
   }
 
-  .proof__item:nth-child(3) b,
-  .proof__item:nth-child(4) b {
+  .proof__item--accent b {
     color: var(--green);
   }
 
